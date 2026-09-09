@@ -1,0 +1,19 @@
+{
+  "isSample": true,
+  "shopName": "আঁচল",
+  "tagline": "শাড়ী, কামিজ ও ওড়নার কালেকশন",
+  "phone": "",
+  "messenger": "",
+  "address": "",
+  "updatedAt": "2026-09-09T00:00:00.000Z",
+  "themes": [
+    { "id": "th1", "name": "জামদানি মোটিফ", "note": "ঐতিহ্যবাহী জামদানি নকশার হাতের কাজ।", "image": null },
+    { "id": "th2", "name": "কাতান বর্ডার", "note": "চওড়া জরির বর্ডার সহ কাতান সিল্কের থিম।", "image": null }
+  ],
+  "products": [
+    { "id": "p1", "name": "নমুনা কাতান শাড়ী", "type": "শাড়ী", "design": "শা-০০১", "price": 3500, "stock": 4, "note": "এটি একটি নমুনা পণ্য। আসল পণ্যের তথ্য দিয়ে এটি প্রতিস্থাপিত হবে।", "themeId": "th2", "image": null },
+    { "id": "p2", "name": "নমুনা জামদানি শাড়ী", "type": "শাড়ী", "design": "শা-০০২", "price": 4200, "stock": 0, "note": "এটি একটি নমুনা পণ্য।", "themeId": "th1", "image": null },
+    { "id": "p3", "name": "নমুনা এমব্রয়ডারি কামিজ", "type": "কামিজ", "design": "কা-০০১", "price": 1800, "stock": 6, "note": "এটি একটি নমুনা পণ্য।", "themeId": null, "image": null },
+    { "id": "p4", "name": "নমুনা সিল্ক ওড়না", "type": "ওড়না", "design": "ও-০০১", "price": 900, "stock": 10, "note": "এটি একটি নমুনা পণ্য।", "themeId": null, "image": null }
+  ]
+}
