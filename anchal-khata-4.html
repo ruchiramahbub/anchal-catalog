@@ -1,0 +1,1608 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>আঁচল খাতা</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+Da+2:wght@500;600;700;800&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --maroon:#7A2048;
+    --maroon-dark:#591634;
+    --maroon-soft:#F4E4EC;
+    --gold:#C08A2E;
+    --gold-soft:#F6ECD6;
+    --teal:#1F4B4A;
+    --teal-soft:#E3EEEC;
+    --cream:#FBF3E7;
+    --card:#FFFFFF;
+    --ink:#2B1B1F;
+    --ink-soft:#8a7378;
+    --line:#E8DCCD;
+    --danger:#A8342F;
+    --danger-soft:#FBEAE8;
+    --good:#3E7A52;
+    --good-soft:#E7F3EA;
+    --radius:12px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:#EDE2D0;
+    font-family:'Hind Siliguri',sans-serif;
+    color:var(--ink);
+    -webkit-tap-highlight-color:transparent;
+  }
+  h1,h2,h3,.brand,.stat-num,.section-title{font-family:'Baloo Da 2',sans-serif;}
+  #app{
+    max-width:480px;
+    min-height:100vh;
+    margin:0 auto;
+    background:var(--cream);
+    position:relative;
+    padding-bottom:84px;
+    box-shadow:0 0 40px rgba(0,0,0,0.08);
+  }
+
+  /* Header */
+  header{
+    background:var(--maroon);
+    color:#fff;
+    padding:18px 18px 22px;
+    position:sticky;
+    top:0;
+    z-index:20;
+    border-radius:0 0 18px 18px;
+  }
+  .header-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+  .header-icon-btn{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.32);color:#fff;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;padding:0;text-decoration:none;}
+  .header-pill-btn{width:auto;border-radius:999px;padding:0 14px;font-family:'Baloo Da 2',sans-serif;font-size:13px;font-weight:600;}
+  .header-icon-btn svg{width:18px;height:18px;}
+  .brand-row{display:flex;align-items:center;gap:10px;}
+  .brand-mark{
+    width:38px;height:38px;flex:none;
+    border-radius:50%;
+    background:var(--maroon-dark);
+    display:flex;align-items:center;justify-content:center;
+    border:1.5px solid rgba(255,255,255,0.35);
+  }
+  .brand{font-size:22px;font-weight:700;letter-spacing:0.2px;margin:0;}
+  .brand-sub{font-size:12.5px;color:#EBD3DD;margin:2px 0 0;font-weight:400;}
+  .today-line{margin-top:14px;font-size:13px;color:#EBD3DD;}
+
+  main{padding:16px 16px 4px;}
+  .view{display:none;}
+  .view.active{display:block;animation:fadein .25s ease;}
+  @keyframes fadein{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+
+  .section-title{font-size:16px;font-weight:600;margin:18px 0 10px;color:var(--ink);}
+  .section-title:first-child{margin-top:0;}
+
+  /* Dashboard stat cards */
+  .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .stat-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:14px 14px;
+    border-left:4px solid var(--maroon);
+  }
+  .stat-card.gold{border-left-color:var(--gold);}
+  .stat-card.teal{border-left-color:var(--teal);}
+  .stat-card.wide{grid-column:1/3;}
+  .stat-label{font-size:12.5px;color:var(--ink-soft);margin:0 0 4px;}
+  .stat-num{font-size:22px;font-weight:700;margin:0;}
+
+  .alert-box{
+    background:var(--gold-soft);
+    border:1px solid #E5CE99;
+    border-radius:var(--radius);
+    padding:12px 14px;
+    font-size:13.5px;
+    color:#6b4e12;
+    margin-top:12px;
+  }
+  .alert-box b{display:block;margin-bottom:4px;font-family:'Baloo Da 2',sans-serif;font-size:14px;}
+
+  /* Cards / list items */
+  .card-list{display:flex;flex-direction:column;gap:10px;}
+  .item{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:12px 13px;
+    display:flex;
+    gap:10px;
+    align-items:flex-start;
+    border-left:4px solid var(--ink-soft);
+    cursor:pointer;
+  }
+  .item-thumb{
+    width:52px;height:52px;flex:none;
+    border-radius:9px;
+    object-fit:cover;
+    background:var(--maroon-soft);
+    border:1px solid var(--line);
+  }
+  .item-thumb.placeholder{
+    display:flex;align-items:center;justify-content:center;
+    color:var(--maroon);
+  }
+  .item-thumb.placeholder.type-কামিজ{background:var(--teal-soft);color:var(--teal);}
+  .item-thumb.placeholder.type-ওড়না{background:var(--gold-soft);color:#8a5f10;}
+  .item-thumb.placeholder.type-অন্যান্য{background:#EFEAE6;color:var(--ink-soft);}
+  .item .accent-maroon{border-left-color:var(--maroon);}
+  .item.type-শাড়ী{border-left-color:var(--maroon);}
+  .item.type-কামিজ{border-left-color:var(--teal);}
+  .item.type-ওড়না{border-left-color:var(--gold);}
+  .item.type-অন্যান্য{border-left-color:var(--ink-soft);}
+  .item-body{flex:1;min-width:0;}
+  .item-top{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+  .item-name{font-weight:600;font-size:15px;}
+  .item-sub{font-size:12.5px;color:var(--ink-soft);margin-top:2px;}
+  .item-right{text-align:right;flex:none;}
+  .item-amount{font-weight:700;font-size:15px;}
+  .item-amount.due{color:var(--danger);}
+  .item-amount.paid{color:var(--good);}
+
+  .tag{
+    display:inline-block;
+    font-size:11px;
+    padding:2px 8px;
+    border-radius:6px;
+    font-weight:600;
+    background:var(--maroon-soft);
+    color:var(--maroon);
+  }
+  .tag.tag-কামিজ{background:var(--teal-soft);color:var(--teal);}
+  .tag.tag-ওড়না{background:var(--gold-soft);color:#8a5f10;}
+  .tag.tag-অন্যান্য{background:#EFEAE6;color:var(--ink-soft);}
+
+  .stock-pill{font-size:11.5px;color:var(--ink-soft);margin-top:4px;}
+  .stock-pill.low{color:var(--danger);font-weight:600;}
+
+  /* search + filters */
+  .search-bar{
+    width:100%;
+    padding:10px 13px;
+    border-radius:10px;
+    border:1px solid var(--line);
+    background:var(--card);
+    font-size:14px;
+    font-family:inherit;
+    margin-bottom:10px;
+  }
+  .chip-row{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px;}
+  .chip{
+    flex:none;
+    padding:6px 13px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    background:var(--card);
+    font-size:13px;
+    color:var(--ink-soft);
+    cursor:pointer;
+    font-family:inherit;
+  }
+  .chip.active{background:var(--maroon);border-color:var(--maroon);color:#fff;}
+
+  .empty-state{
+    text-align:center;
+    padding:40px 20px;
+    color:var(--ink-soft);
+    font-size:14px;
+    line-height:1.7;
+  }
+  .empty-state span{font-size:34px;display:block;margin-bottom:8px;}
+
+  /* Buttons */
+  .btn{
+    font-family:inherit;
+    font-size:14.5px;
+    font-weight:600;
+    border-radius:10px;
+    padding:11px 16px;
+    border:none;
+    cursor:pointer;
+  }
+  .btn-primary{background:var(--maroon);color:#fff;}
+  .btn-ghost{background:var(--card);color:var(--ink);border:1px solid var(--line);}
+  .btn-danger{background:var(--danger-soft);color:var(--danger);}
+  .btn-block{width:100%;}
+  .btn-row{display:flex;gap:10px;margin-top:18px;}
+  .btn-row .btn{flex:1;}
+
+  /* FAB */
+  .fab{
+    position:fixed;
+    right:calc(50% - 240px + 18px);
+    bottom:86px;
+    width:54px;height:54px;
+    border-radius:50%;
+    background:var(--maroon);
+    color:#fff;
+    border:none;
+    font-size:26px;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 6px 16px rgba(122,32,72,0.4);
+    cursor:pointer;
+    z-index:30;
+  }
+  @media (max-width:480px){
+    .fab{right:18px;}
+  }
+
+  /* Bottom nav */
+  .navbar{
+    position:fixed;
+    bottom:0;left:50%;transform:translateX(-50%);
+    width:100%;max-width:480px;
+    background:#fff;
+    border-top:1px solid var(--line);
+    display:flex;
+    z-index:25;
+    padding:6px 4px calc(6px + env(safe-area-inset-bottom));
+  }
+  .navbtn{
+    flex:1;
+    display:flex;flex-direction:column;align-items:center;gap:3px;
+    background:none;border:none;
+    padding:6px 2px;
+    color:var(--ink-soft);
+    font-family:'Hind Siliguri',sans-serif;
+    font-size:10.5px;
+    cursor:pointer;
+  }
+  .navbtn svg{width:19px;height:19px;}
+  .navbtn.active{color:var(--maroon);}
+
+  /* Theme gallery */
+  .theme-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
+  .theme-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;cursor:pointer;}
+  .theme-card img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;background:var(--gold-soft);}
+  .theme-card-placeholder{width:100%;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;background:var(--gold-soft);color:#8a5f10;font-size:28px;}
+  .theme-card-body{padding:8px 10px;}
+  .theme-card-name{font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+  /* Theme picker inside product form */
+  .theme-picker-row{display:flex;gap:10px;overflow-x:auto;padding:2px 2px 6px;}
+  .theme-chip{flex:none;width:64px;text-align:center;cursor:pointer;}
+  .theme-chip-box{width:60px;height:60px;object-fit:cover;border-radius:10px;border:2px solid var(--line);display:block;margin:0 auto;background:var(--card);}
+  .theme-chip-box.placeholder{display:flex;align-items:center;justify-content:center;font-size:20px;background:var(--gold-soft);}
+  .theme-chip-box.none-box{display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--ink-soft);background:var(--card);border-style:dashed;}
+  .theme-chip.selected .theme-chip-box{border-color:var(--maroon);}
+  .theme-chip-name{display:block;font-size:10.5px;color:var(--ink-soft);margin-top:4px;max-width:64px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .theme-tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:6px;font-weight:600;background:var(--gold-soft);color:#8a5f10;margin-left:4px;}
+  .design-tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:6px;font-weight:600;background:#fff;color:var(--ink-soft);border:1px solid var(--line);margin-left:4px;}
+
+  /* Modal */
+  .modal-overlay{
+    display:none;
+    position:fixed;inset:0;
+    background:rgba(43,27,31,0.45);
+    z-index:50;
+    align-items:flex-end;
+    justify-content:center;
+  }
+  .modal-overlay.active{display:flex;}
+  .modal{
+    background:var(--cream);
+    width:100%;max-width:480px;
+    max-height:88vh;
+    overflow-y:auto;
+    border-radius:18px 18px 0 0;
+    padding:18px 18px calc(24px + env(safe-area-inset-bottom));
+  }
+  .modal-handle{width:38px;height:4px;background:var(--line);border-radius:99px;margin:0 auto 14px;}
+  .modal h2{font-size:18px;margin:0 0 14px;}
+  .field{margin-bottom:13px;}
+  .field label{display:block;font-size:13px;color:var(--ink-soft);margin-bottom:5px;font-weight:500;}
+  .field input,.field select,.field textarea{
+    width:100%;
+    padding:11px 12px;
+    border-radius:9px;
+    border:1px solid var(--line);
+    background:#fff;
+    font-family:inherit;
+    font-size:14.5px;
+    color:var(--ink);
+  }
+  .field textarea{resize:vertical;min-height:60px;}
+  .field-row{display:flex;gap:10px;}
+  .field-row .field{flex:1;}
+  .readonly-total{
+    background:var(--maroon-soft);
+    border-radius:9px;
+    padding:10px 12px;
+    display:flex;justify-content:space-between;align-items:center;
+    font-size:14px;margin-bottom:13px;
+  }
+  .readonly-total b{font-size:17px;color:var(--maroon);}
+  .due-line{display:flex;justify-content:space-between;font-size:13.5px;color:var(--ink-soft);margin-top:6px;}
+  .due-line b{color:var(--danger);}
+
+  .img-field{display:flex;align-items:center;gap:12px;}
+  .img-preview{
+    width:76px;height:76px;flex:none;
+    border-radius:12px;
+    object-fit:cover;
+    background:var(--maroon-soft);
+    border:1px solid var(--line);
+  }
+  .img-preview.placeholder{display:flex;align-items:center;justify-content:center;color:var(--ink-soft);font-size:11px;text-align:center;}
+  .img-buttons{display:flex;flex-direction:column;gap:8px;flex:1;}
+  .img-buttons label.btn{display:inline-flex;align-items:center;justify-content:center;width:100%;}
+  .img-buttons input[type=file]{display:none;}
+  .detail-image{width:100%;max-height:180px;object-fit:cover;border-radius:12px;margin-bottom:14px;border:1px solid var(--line);}
+  .detail-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px;}
+  .detail-row:last-child{border-bottom:none;}
+  .detail-row span:first-child{color:var(--ink-soft);}
+  .detail-row span:last-child{font-weight:600;}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header>
+    <div class="header-top">
+      <div class="brand-row">
+        <div class="brand-mark">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M12 3C9 6 6 9 6 13a6 6 0 0012 0c0-4-3-7-6-10z" stroke="#E7B75C" stroke-width="1.6" stroke-linejoin="round"/>
+            <circle cx="12" cy="14" r="2" stroke="#E7B75C" stroke-width="1.4"/>
+          </svg>
+        </div>
+        <div>
+          <p class="brand">আঁচল খাতা</p>
+          <p class="brand-sub">শাড়ী · কামিজ · ওড়নার বিক্রয় ও হিসাব</p>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex:none;">
+        <a class="header-icon-btn header-pill-btn" href="./catalog.html" target="_blank" rel="noopener" aria-label="আঁচল ক্যাটালগ দেখুন">আঁচল</a>
+        <button class="header-icon-btn" id="btnSettings" aria-label="সেটিংস ও ক্যাটালগ এক্সপোর্ট">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M19.4 13a7.6 7.6 0 0 0 0-2l2-1.5-2-3.5-2.4 1a7.6 7.6 0 0 0-1.7-1L15 3h-4l-.3 2.5a7.6 7.6 0 0 0-1.7 1l-2.4-1-2 3.5L6.6 11a7.6 7.6 0 0 0 0 2l-2 1.5 2 3.5 2.4-1a7.6 7.6 0 0 0 1.7 1L11 21h4l.3-2.5a7.6 7.6 0 0 0 1.7-1l2.4 1 2-3.5z"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="today-line" id="todayLine"></div>
+  </header>
+
+  <main>
+
+    <!-- DASHBOARD -->
+    <div class="view active" id="view-dashboard">
+      <div class="section-title">আজকের অবস্থা</div>
+      <div class="stat-grid">
+        <div class="stat-card">
+          <p class="stat-label">আজকের বিক্রয়</p>
+          <p class="stat-num" id="statTodaySales">৳০</p>
+        </div>
+        <div class="stat-card gold">
+          <p class="stat-label">মোট বাকি</p>
+          <p class="stat-num" id="statTotalDue">৳০</p>
+        </div>
+        <div class="stat-card teal wide">
+          <p class="stat-label">স্টকে পণ্য</p>
+          <p class="stat-num" id="statStockCount">০ টি</p>
+        </div>
+      </div>
+      <div id="lowStockAlert"></div>
+
+      <button class="btn btn-block" id="btnShareFacebook" style="background:#1877F2;color:#fff;margin-top:14px;display:flex;align-items:center;justify-content:center;gap:8px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.3c-1.2 0-1.6.8-1.6 1.6V12h2.8l-.4 2.9h-2.4v7A10 10 0 0 0 22 12z"/></svg>
+        Facebook-এ ক্যাটালগ শেয়ার করুন
+      </button>
+
+      <div class="section-title">সাম্প্রতিক বিক্রয়</div>
+      <div class="card-list" id="recentSalesList"></div>
+    </div>
+
+    <!-- PRODUCTS -->
+    <div class="view" id="view-products">
+      <input class="search-bar" id="productSearch" placeholder="পণ্যের নাম বা ডিজাইন কোড খুঁজুন">
+      <div class="chip-row" id="productFilterChips">
+        <button class="chip active" data-type="সব">সব</button>
+        <button class="chip" data-type="শাড়ী">শাড়ী</button>
+        <button class="chip" data-type="কামিজ">কামিজ</button>
+        <button class="chip" data-type="ওড়না">ওড়না</button>
+        <button class="chip" data-type="অন্যান্য">অন্যান্য</button>
+      </div>
+      <div class="card-list" id="productsList"></div>
+    </div>
+
+    <!-- THEMES -->
+    <div class="view" id="view-themes">
+      <input class="search-bar" id="themeSearch" placeholder="থিমের নাম খুঁজুন">
+      <div class="theme-grid" id="themesGrid"></div>
+    </div>
+
+    <!-- SALES -->
+    <div class="view" id="view-sales">
+      <input class="search-bar" id="saleSearch" placeholder="ক্রেতার নাম বা পণ্য খুঁজুন">
+      <div class="card-list" id="salesList"></div>
+    </div>
+
+    <!-- DUES -->
+    <div class="view" id="view-dues">
+      <div class="card-list" id="duesList"></div>
+    </div>
+
+  </main>
+
+  <button class="fab" id="fabBtn">+</button>
+
+  <nav class="navbar">
+    <button class="navbtn active" data-view="dashboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/></svg>
+      খাতা
+    </button>
+    <button class="navbtn" data-view="products">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3v3M8 6l4-3 4 3M4 10l8-4 8 4-1.5 9a2 2 0 0 1-2 1.7H7.5a2 2 0 0 1-2-1.7z"/></svg>
+      পণ্য
+    </button>
+    <button class="navbtn" data-view="themes">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3a9 9 0 1 0 0 18c1.4 0 2-.9 1-1.8-.7-.6-.6-1.9.7-2.2h1.6a4 4 0 0 0 4-4A9 9 0 0 0 12 3z"/><circle cx="8" cy="10.5" r="1.1" fill="currentColor" stroke="none"/><circle cx="12" cy="7.5" r="1.1" fill="currentColor" stroke="none"/><circle cx="16" cy="10.5" r="1.1" fill="currentColor" stroke="none"/></svg>
+      থিম
+    </button>
+    <button class="navbtn" data-view="sales">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6 3h9l3 3v15H6z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>
+      বিক্রয়
+    </button>
+    <button class="navbtn" data-view="dues">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="9" r="5"/><circle cx="15" cy="15" r="5"/></svg>
+      বাকি
+    </button>
+  </nav>
+
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modalBody"></div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- helpers ----------
+  const bnDigits = {'0':'০','1':'১','2':'২','3':'৩','4':'৪','5':'৫','6':'৬','7':'৭','8':'৮','9':'৯'};
+  function bn(n){ return String(n).split('').map(c=>bnDigits[c]!==undefined?bnDigits[c]:c).join(''); }
+  function groupBD(num){
+    let n = Math.round(Number(num)||0);
+    let neg = n<0; n = Math.abs(n);
+    let s = String(n);
+    if(s.length<=3) return (neg?'-':'')+s;
+    let last3 = s.slice(-3);
+    let rest = s.slice(0,-3).replace(/\B(?=(\d{2})+(?!\d))/g,',');
+    return (neg?'-':'')+rest+','+last3;
+  }
+  function taka(n){ return '৳'+bn(groupBD(n)); }
+  const bnMonths=['জানুয়ারি','ফেব্রুয়ারি','মার্চ','এপ্রিল','মে','জুন','জুলাই','আগস্ট','সেপ্টেম্বর','অক্টোবর','নভেম্বর','ডিসেম্বর'];
+  function fmtDate(d){ d=new Date(d); return bn(d.getDate())+' '+bnMonths[d.getMonth()]+', '+bn(d.getFullYear()); }
+  function todayStr(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+  function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+  function escapeHtml(s){ return String(s==null?'':s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+  function thumbHtml(imageData, type){
+    if(imageData){
+      return `<img class="item-thumb" src="${imageData}" alt="">`;
+    }
+    return `<div class="item-thumb placeholder type-${type||'অন্যান্য'}">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 6l4-3 4 3M4 10l8-4 8 4-1.5 9a2 2 0 0 1-2 1.7H7.5a2 2 0 0 1-2-1.7z"/></svg>
+    </div>`;
+  }
+
+  function resizeImage(file, maxDim, quality){
+    return new Promise((resolve, reject)=>{
+      const reader = new FileReader();
+      reader.onload = e=>{
+        const img = new Image();
+        img.onload = ()=>{
+          let w=img.width, h=img.height;
+          if(w>h){ if(w>maxDim){ h=Math.round(h*maxDim/w); w=maxDim; } }
+          else { if(h>maxDim){ w=Math.round(w*maxDim/h); h=maxDim; } }
+          const canvas = document.createElement('canvas');
+          canvas.width=w; canvas.height=h;
+          canvas.getContext('2d').drawImage(img,0,0,w,h);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.onerror = ()=>reject(new Error('image load failed'));
+        img.src = e.target.result;
+      };
+      reader.onerror = ()=>reject(new Error('read failed'));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // ---------- storage adapter ----------
+  // window.storage only exists when this app is opened inside Claude's chat/artifact view.
+  // If the file is downloaded and opened directly in a browser (e.g. from the phone's
+  // Downloads folder), window.storage is not available at all — so we fall back to the
+  // browser's own localStorage in that case, keeping the app usable either way.
+  const nativeStorageAvailable = (typeof window !== 'undefined') && !!window.storage && typeof window.storage.get === 'function';
+  let localStorageAvailable = false;
+  try{ const k='__anchal_test__'; localStorage.setItem(k,'1'); localStorage.removeItem(k); localStorageAvailable = true; }catch(e){ localStorageAvailable = false; }
+  const storageMode = nativeStorageAvailable ? 'native' : (localStorageAvailable ? 'local' : 'none');
+  const LS_PREFIX = 'anchal-khata:';
+
+  const storageAdapter = {
+    async get(key){
+      if(storageMode==='native'){
+        return await window.storage.get(key, false);
+      } else if(storageMode==='local'){
+        const v = localStorage.getItem(LS_PREFIX+key);
+        return v!==null ? {key, value:v, shared:false} : null;
+      } else {
+        throw new Error('no storage available');
+      }
+    },
+    async set(key, value){
+      if(storageMode==='native'){
+        return await window.storage.set(key, value, false);
+      } else if(storageMode==='local'){
+        localStorage.setItem(LS_PREFIX+key, value);
+        return {key, value, shared:false};
+      } else {
+        throw new Error('no storage available');
+      }
+    },
+    async delete(key){
+      if(storageMode==='native'){
+        return await window.storage.delete(key, false);
+      } else if(storageMode==='local'){
+        localStorage.removeItem(LS_PREFIX+key);
+        return {key, deleted:true, shared:false};
+      } else {
+        throw new Error('no storage available');
+      }
+    }
+  };
+
+  // ---------- state ----------
+  let products = [];
+  let sales = [];
+  let themes = [];
+  let productImages = {};   // id -> dataURL, stored under separate keys so the main lists stay small
+  let themeImages = {};
+  let shopSettings = {shopName:'আঁচল', tagline:'শাড়ী, কামিজ ও ওড়নার কালেকশন', phone:'', messenger:'', address:'', catalogUrl:'', githubUser:'', githubRepo:'', githubToken:'', githubPath:'catalog-data.json'};
+  let productFilter = 'সব';
+  let productSearchTerm = '';
+  let saleSearchTerm = '';
+  let themeSearchTerm = '';
+
+  // ---------- storage ----------
+  // Images are stored under their own key per product/theme (product-image:<id>, theme-image:<id>)
+  // instead of inside the main 'products'/'themes' array. This keeps those two keys small and
+  // reliably saveable no matter how many photos are added, since each image write is capped
+  // separately instead of all images competing for one shared size limit.
+  async function loadAll(){
+    try{
+      const p = await storageAdapter.get('products');
+      products = p ? JSON.parse(p.value) : [];
+    }catch(e){ products = []; }
+    try{
+      const s = await storageAdapter.get('sales');
+      sales = s ? JSON.parse(s.value) : [];
+    }catch(e){ sales = []; }
+    try{
+      const t = await storageAdapter.get('themes');
+      themes = t ? JSON.parse(t.value) : [];
+    }catch(e){ themes = []; }
+    try{
+      const ss = await storageAdapter.get('shopSettings');
+      if(ss) shopSettings = Object.assign({}, shopSettings, JSON.parse(ss.value));
+    }catch(e){ /* keep defaults */ }
+    await loadAndMigrateImages();
+    renderAll();
+  }
+  async function saveShopSettings(){
+    try{ await storageAdapter.set('shopSettings', JSON.stringify(shopSettings)); }
+    catch(e){ alert('সেটিংস সংরক্ষণে সমস্যা হয়েছে।'); }
+  }
+  async function loadAndMigrateImages(){
+    let productsChanged = false, themesChanged = false;
+    await Promise.all(products.map(async p=>{
+      if(p.image){
+        // older version of the app stored the photo inline; move it to its own key
+        productImages[p.id] = p.image;
+        await saveProductImage(p.id, p.image);
+        delete p.image;
+        productsChanged = true;
+      } else {
+        try{ const r = await storageAdapter.get('product-image:'+p.id, false); if(r) productImages[p.id] = r.value; }catch(e){}
+      }
+    }));
+    await Promise.all(themes.map(async t=>{
+      if(t.image){
+        themeImages[t.id] = t.image;
+        await saveThemeImage(t.id, t.image);
+        delete t.image;
+        themesChanged = true;
+      } else {
+        try{ const r = await storageAdapter.get('theme-image:'+t.id, false); if(r) themeImages[t.id] = r.value; }catch(e){}
+      }
+    }));
+    if(productsChanged) await saveProducts();
+    if(themesChanged) await saveThemes();
+  }
+  async function saveProducts(){
+    try{ await storageAdapter.set('products', JSON.stringify(products)); }
+    catch(e){ alert('পণ্যের তথ্য সংরক্ষণে সমস্যা হয়েছে। আবার চেষ্টা করুন।'); }
+  }
+  async function saveSales(){
+    try{ await storageAdapter.set('sales', JSON.stringify(sales)); }
+    catch(e){ alert('বিক্রয়ের তথ্য সংরক্ষণে সমস্যা হয়েছে। আবার চেষ্টা করুন।'); }
+  }
+  async function saveThemes(){
+    try{ await storageAdapter.set('themes', JSON.stringify(themes)); }
+    catch(e){ alert('থিমের তথ্য সংরক্ষণে সমস্যা হয়েছে। আবার চেষ্টা করুন।'); }
+  }
+  async function saveProductImage(id, dataUrl){
+    try{
+      if(dataUrl){ await storageAdapter.set('product-image:'+id, dataUrl, false); }
+      else { try{ await storageAdapter.delete('product-image:'+id, false); }catch(e){} }
+    }catch(e){ alert('ছবি সংরক্ষণে সমস্যা হয়েছে। ছবিটি একটু ছোট করে আবার চেষ্টা করুন।'); }
+  }
+  async function saveThemeImage(id, dataUrl){
+    try{
+      if(dataUrl){ await storageAdapter.set('theme-image:'+id, dataUrl, false); }
+      else { try{ await storageAdapter.delete('theme-image:'+id, false); }catch(e){} }
+    }catch(e){ alert('ছবি সংরক্ষণে সমস্যা হয়েছে। ছবিটি একটু ছোট করে আবার চেষ্টা করুন।'); }
+  }
+
+  // ---------- nav ----------
+  function switchView(name){
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    document.getElementById('view-'+name).classList.add('active');
+    document.querySelectorAll('.navbtn').forEach(b=>b.classList.toggle('active', b.dataset.view===name));
+    currentView = name;
+  }
+  let currentView = 'dashboard';
+  document.querySelectorAll('.navbtn').forEach(b=>{
+    b.addEventListener('click', ()=>switchView(b.dataset.view));
+  });
+
+  document.getElementById('fabBtn').addEventListener('click', ()=>{
+    if(currentView==='products') openProductModal(null);
+    else if(currentView==='themes') openThemeModal(null);
+    else if(currentView==='sales') openSaleModal();
+    else if(currentView==='dues') switchView('sales');
+    else openSaleModal();
+  });
+
+  // ---------- render: dashboard ----------
+  function renderDashboard(){
+    const today = todayStr();
+    const todaySales = sales.filter(s=>s.date===today).reduce((sum,s)=>sum+s.total,0);
+    const totalDue = sales.reduce((sum,s)=>sum+s.due,0);
+    const stockCount = products.reduce((sum,p)=>sum+Number(p.stock||0),0);
+
+    document.getElementById('statTodaySales').textContent = taka(todaySales);
+    document.getElementById('statTotalDue').textContent = taka(totalDue);
+    document.getElementById('statStockCount').textContent = bn(stockCount)+' টি';
+
+    const low = products.filter(p=>Number(p.stock)<=2);
+    const alertBox = document.getElementById('lowStockAlert');
+    if(low.length){
+      alertBox.innerHTML = `<div class="alert-box"><b>কম মজুদ</b>${low.map(p=>escapeHtml(p.name)+' — মাত্র '+bn(p.stock)+' টি বাকি').join('<br>')}</div>`;
+    } else {
+      alertBox.innerHTML = '';
+    }
+
+    const recent = [...sales].sort((a,b)=> (b.date+b.id).localeCompare(a.date+a.id)).slice(0,6);
+    const listEl = document.getElementById('recentSalesList');
+    if(!recent.length){
+      listEl.innerHTML = `<div class="empty-state"><span>🧵</span>এখনো কোনো বিক্রয় নেই।<br>নিচের + বাটনে চেপে প্রথম বিক্রয় যোগ করুন।</div>`;
+      return;
+    }
+    listEl.innerHTML = recent.map(s=>saleItemHtml(s)).join('');
+  }
+
+  // ---------- render: products ----------
+  function typeTagClass(t){ return 'tag tag-'+t; }
+  function themeNameById(id){ const t = themes.find(x=>x.id===id); return t ? t.name : null; }
+  function productItemHtml(p){
+    const low = Number(p.stock)<=2;
+    const themeName = p.themeId ? themeNameById(p.themeId) : null;
+    return `<div class="item type-${p.type}" data-action="open-product" data-id="${p.id}">
+      ${thumbHtml(productImages[p.id], p.type)}
+      <div class="item-body">
+        <div class="item-top">
+          <span class="item-name">${escapeHtml(p.name)}</span>
+        </div>
+        <div class="item-sub"><span class="${typeTagClass(p.type)}">${p.type}</span>${p.design?`<span class="design-tag">${escapeHtml(p.design)}</span>`:''}${themeName?`<span class="theme-tag">${escapeHtml(themeName)}</span>`:''}</div>
+        <div class="stock-pill ${low?'low':''}">মজুদ: ${bn(p.stock)} টি ${low?'(কম)':''}</div>
+      </div>
+      <div class="item-right">
+        <div class="item-amount">${taka(p.price)}</div>
+      </div>
+    </div>`;
+  }
+  function renderProducts(){
+    const chips = document.querySelectorAll('#productFilterChips .chip');
+    chips.forEach(c=>c.classList.toggle('active', c.dataset.type===productFilter));
+
+    let list = products.slice();
+    if(productFilter!=='সব') list = list.filter(p=>p.type===productFilter);
+    if(productSearchTerm.trim()){
+      const q = productSearchTerm.trim().toLowerCase();
+      list = list.filter(p=> p.name.toLowerCase().includes(q) || (p.design||'').toLowerCase().includes(q));
+    }
+    list.sort((a,b)=>b.createdAt-a.createdAt);
+
+    const el = document.getElementById('productsList');
+    if(!list.length){
+      el.innerHTML = `<div class="empty-state"><span>👗</span>এখনো কোনো পণ্য যোগ করা হয়নি।<br>+ বাটনে চেপে নতুন পণ্য যোগ করুন।</div>`;
+      return;
+    }
+    el.innerHTML = list.map(productItemHtml).join('');
+  }
+  document.getElementById('productSearch').addEventListener('input', e=>{ productSearchTerm=e.target.value; renderProducts(); });
+  document.getElementById('productFilterChips').addEventListener('click', e=>{
+    const chip = e.target.closest('.chip');
+    if(!chip) return;
+    productFilter = chip.dataset.type;
+    renderProducts();
+  });
+
+  // ---------- render: sales ----------
+  function saleItemHtml(s){
+    const dueLabel = s.due>0 ? `<div class="item-amount due">বাকি ${taka(s.due)}</div>` : `<div class="item-amount paid">পরিশোধিত</div>`;
+    const prod = products.find(p=>p.id===s.productId);
+    return `<div class="item type-${s.type||'অন্যান্য'}" data-action="open-sale" data-id="${s.id}">
+      ${thumbHtml(prod?productImages[prod.id]:null, s.type)}
+      <div class="item-body">
+        <div class="item-top"><span class="item-name">${escapeHtml(s.customerName)}</span></div>
+        <div class="item-sub">${escapeHtml(s.productName)} <span class="${typeTagClass(s.type||'অন্যান্য')}">${s.type||''}</span></div>
+        <div class="item-sub">${fmtDate(s.date)} · ${bn(s.qty)} পিস</div>
+      </div>
+      <div class="item-right">
+        <div class="item-amount">${taka(s.total)}</div>
+        ${dueLabel}
+      </div>
+    </div>`;
+  }
+  function renderSales(){
+    let list = sales.slice();
+    if(saleSearchTerm.trim()){
+      const q = saleSearchTerm.trim().toLowerCase();
+      list = list.filter(s=> s.customerName.toLowerCase().includes(q) || s.productName.toLowerCase().includes(q));
+    }
+    list.sort((a,b)=> (b.date+b.id).localeCompare(a.date+a.id));
+    const el = document.getElementById('salesList');
+    if(!list.length){
+      el.innerHTML = `<div class="empty-state"><span>🧾</span>এখনো কোনো বিক্রয় যোগ করা হয়নি।<br>+ বাটনে চেপে নতুন বিক্রয় লিখুন।</div>`;
+      return;
+    }
+    el.innerHTML = list.map(saleItemHtml).join('');
+  }
+  document.getElementById('saleSearch').addEventListener('input', e=>{ saleSearchTerm=e.target.value; renderSales(); });
+
+  // ---------- render: themes ----------
+  function themeItemHtml(t){
+    return `<div class="theme-card" data-action="open-theme" data-id="${t.id}">
+      ${themeImages[t.id]?`<img src="${themeImages[t.id]}" alt="">`:`<div class="theme-card-placeholder">🎨</div>`}
+      <div class="theme-card-body">
+        <div class="theme-card-name">${escapeHtml(t.name)}</div>
+      </div>
+    </div>`;
+  }
+  function renderThemes(){
+    let list = themes.slice();
+    if(themeSearchTerm.trim()){
+      const q = themeSearchTerm.trim().toLowerCase();
+      list = list.filter(t=>t.name.toLowerCase().includes(q));
+    }
+    list.sort((a,b)=>b.createdAt-a.createdAt);
+    const el = document.getElementById('themesGrid');
+    if(!list.length){
+      el.innerHTML = `<div class="empty-state" style="grid-column:1/3;"><span>🎨</span>এখনো কোনো থিম যোগ করা হয়নি।<br>+ বাটনে চেপে থিমের ছবি যোগ করুন।</div>`;
+      return;
+    }
+    el.innerHTML = list.map(themeItemHtml).join('');
+  }
+  document.getElementById('themeSearch').addEventListener('input', e=>{ themeSearchTerm=e.target.value; renderThemes(); });
+
+  // ---------- render: dues ----------
+  function renderDues(){
+    const map = {};
+    sales.forEach(s=>{
+      if(s.due>0){
+        const key = s.customerName+'|'+(s.customerPhone||'');
+        if(!map[key]) map[key] = {name:s.customerName, phone:s.customerPhone, total:0, sales:[]};
+        map[key].total += s.due;
+        map[key].sales.push(s);
+      }
+    });
+    const groups = Object.values(map).sort((a,b)=>b.total-a.total);
+    const el = document.getElementById('duesList');
+    if(!groups.length){
+      el.innerHTML = `<div class="empty-state"><span>✅</span>কোনো বাকি নেই।<br>সব হিসাব পরিষ্কার আছে!</div>`;
+      return;
+    }
+    el.innerHTML = groups.map(g=>`
+      <div class="item accent-maroon" data-action="open-due" data-key="${escapeHtml(g.name+'|'+(g.phone||''))}">
+        <div class="item-body">
+          <div class="item-top"><span class="item-name">${escapeHtml(g.name)}</span></div>
+          <div class="item-sub">${g.phone?escapeHtml(g.phone):'ফোন নম্বর নেই'} · ${bn(g.sales.length)} টি হিসাব বাকি</div>
+        </div>
+        <div class="item-right"><div class="item-amount due">${taka(g.total)}</div></div>
+      </div>`).join('');
+  }
+
+  function renderAll(){
+    renderDashboard(); renderProducts(); renderThemes(); renderSales(); renderDues();
+  }
+
+  // ---------- modal helpers ----------
+  const overlay = document.getElementById('modalOverlay');
+  const modalBody = document.getElementById('modalBody');
+  function openModal(html){ modalBody.innerHTML = `<div class="modal-handle"></div>` + html; overlay.classList.add('active'); }
+  function closeModal(){ overlay.classList.remove('active'); modalBody.innerHTML=''; }
+  overlay.addEventListener('click', e=>{ if(e.target===overlay) closeModal(); });
+
+  // ---------- product modal ----------
+  function nextDesignCode(type){
+    const prefixMap = {'শাড়ী':'শা','কামিজ':'কা','ওড়না':'ও','অন্যান্য':'প'};
+    const prefix = prefixMap[type] || 'প';
+    const count = products.filter(x=>x.type===type).length + 1;
+    return prefix + '-' + bn(String(count).padStart(3,'0'));
+  }
+
+  function openProductModal(id){
+    const p = id ? products.find(x=>x.id===id) : null;
+    const draft = p
+      ? {name:p.name, type:p.type, design:p.design||'', price:p.price, stock:p.stock, note:p.note||'', image:productImages[p.id]||null, themeId:p.themeId||null}
+      : {name:'', type:'শাড়ী', design:nextDesignCode('শাড়ী'), price:'', stock:'', note:'', image:null, themeId:null};
+    renderProductForm(id, draft);
+  }
+
+  function themePickerHtml(selectedId){
+    const noneSelected = !selectedId;
+    let chips = `<div class="theme-chip ${noneSelected?'selected':''}" data-theme-id="none">
+        <div class="theme-chip-box none-box">✕</div>
+        <span class="theme-chip-name">কোনো থিম</span>
+      </div>`;
+    chips += themes.map(t=>`<div class="theme-chip ${selectedId===t.id?'selected':''}" data-theme-id="${t.id}">
+        ${themeImages[t.id]?`<img class="theme-chip-box" src="${themeImages[t.id]}" alt="">`:`<div class="theme-chip-box placeholder">🎨</div>`}
+        <span class="theme-chip-name">${escapeHtml(t.name)}</span>
+      </div>`).join('');
+    const hint = themes.length ? '' : `<p style="font-size:12px;color:var(--ink-soft);margin:6px 0 0;">এখনো কোনো থিম যোগ করা হয়নি। থিম ট্যাব থেকে যোগ করতে পারবেন।</p>`;
+    return `<div class="theme-picker-row" id="themePicker">${chips}</div>${hint}`;
+  }
+
+  function renderProductForm(id, draft){
+    const p = id ? products.find(x=>x.id===id) : null;
+    openModal(`
+      <h2>${p?'পণ্য সম্পাদনা':'নতুন পণ্য যোগ করুন'}</h2>
+      <div class="field">
+        <label>পণ্যের ছবি</label>
+        <div class="img-field">
+          <div id="f-image-preview" style="cursor:pointer;">${draft.image?`<img class="img-preview" src="${draft.image}" alt="">`:`<div class="img-preview placeholder">কোনো ছবি নেই</div>`}</div>
+          <div class="img-buttons">
+            <label class="btn btn-ghost" for="f-image-input" id="f-image-label">${draft.image?'ছবি পরিবর্তন করুন':'ছবি বাছাই করুন'}</label>
+            <input type="file" id="f-image-input" accept="image/*">
+            <button class="btn btn-ghost" id="btnRemoveImage" style="display:${draft.image?'block':'none'};">ছবি মুছুন</button>
+          </div>
+        </div>
+        <p style="font-size:12px;color:var(--ink-soft);margin:6px 0 0;">ছবির উপর চাপলে এডিট টুল খুলবে (ঘোরানো, উজ্জ্বলতা, ফিল্টার, AI নাম সাজেশন)।</p>
+      </div>
+      <div class="field"><label>পণ্যের নাম</label><input id="f-name" value="${escapeHtml(draft.name)}" placeholder="যেমন: কাতান শাড়ী"></div>
+      <div class="field-row">
+        <div class="field"><label>ধরন</label>
+          <select id="f-type">
+            ${['শাড়ী','কামিজ','ওড়না','অন্যান্য'].map(t=>`<option ${draft.type===t?'selected':''}>${t}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field"><label>ডিজাইন / কোড</label><input id="f-design" value="${escapeHtml(draft.design)}"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>বিক্রয়মূল্য (৳)</label><input id="f-price" type="number" inputmode="decimal" value="${draft.price}" placeholder="০"></div>
+        <div class="field"><label>মজুদ পরিমাণ</label><input id="f-stock" type="number" inputmode="numeric" value="${draft.stock}" placeholder="০"></div>
+      </div>
+      <div class="field">
+        <label>থিম (ঐচ্ছিক)</label>
+        ${themePickerHtml(draft.themeId)}
+      </div>
+      <div class="field"><label>নোট</label><textarea id="f-note" placeholder="ঐচ্ছিক">${escapeHtml(draft.note)}</textarea></div>
+      <div class="btn-row">
+        ${p?`<button class="btn btn-danger" id="btnDeleteProduct">মুছে ফেলুন</button>`:''}
+        <button class="btn btn-ghost" id="btnCancel">বাতিল</button>
+        <button class="btn btn-primary" id="btnSaveProduct">সংরক্ষণ করুন</button>
+      </div>
+    `);
+
+    const imgInput = document.getElementById('f-image-input');
+    const imgPreview = document.getElementById('f-image-preview');
+    const imgLabel = document.getElementById('f-image-label');
+    const removeBtn = document.getElementById('btnRemoveImage');
+    const nameField = document.getElementById('f-name');
+    const typeField = document.getElementById('f-type');
+    const designField = document.getElementById('f-design');
+    const priceField = document.getElementById('f-price');
+    const stockField = document.getElementById('f-stock');
+    const noteField = document.getElementById('f-note');
+
+    nameField.addEventListener('input', e=>draft.name=e.target.value);
+    designField.addEventListener('input', e=>draft.design=e.target.value);
+    priceField.addEventListener('input', e=>draft.price=e.target.value);
+    stockField.addEventListener('input', e=>draft.stock=e.target.value);
+    noteField.addEventListener('input', e=>draft.note=e.target.value);
+    typeField.addEventListener('change', e=>{
+      draft.type = e.target.value;
+      if(!p){ draft.design = nextDesignCode(draft.type); designField.value = draft.design; }
+    });
+
+    imgPreview.addEventListener('click', ()=>{
+      if(draft.image){
+        openImageEditor(draft.image, draft, (edited)=>{ draft.image = edited; renderProductForm(id, draft); }, ()=>renderProductForm(id, draft));
+      } else {
+        imgInput.click();
+      }
+    });
+    imgInput.addEventListener('change', async ()=>{
+      const file = imgInput.files && imgInput.files[0];
+      if(!file) return;
+      try{
+        draft.image = await resizeImage(file, 480, 0.62);
+        imgPreview.innerHTML = `<img class="img-preview" src="${draft.image}" alt="">`;
+        imgLabel.textContent = 'ছবি পরিবর্তন করুন';
+        removeBtn.style.display = 'block';
+      }catch(err){
+        alert('ছবি প্রক্রিয়া করতে সমস্যা হয়েছে, আবার চেষ্টা করুন।');
+      }
+    });
+    removeBtn.addEventListener('click', ()=>{
+      draft.image = null;
+      imgInput.value = '';
+      imgPreview.innerHTML = `<div class="img-preview placeholder">কোনো ছবি নেই</div>`;
+      imgLabel.textContent = 'ছবি বাছাই করুন';
+      removeBtn.style.display = 'none';
+    });
+
+    const themePicker = document.getElementById('themePicker');
+    if(themePicker){
+      themePicker.addEventListener('click', e=>{
+        const chip = e.target.closest('[data-theme-id]');
+        if(!chip) return;
+        const tid = chip.dataset.themeId;
+        draft.themeId = tid==='none' ? null : tid;
+        themePicker.querySelectorAll('[data-theme-id]').forEach(c=>{
+          c.classList.toggle('selected', c.dataset.themeId === (draft.themeId||'none'));
+        });
+      });
+    }
+
+    document.getElementById('btnCancel').onclick = closeModal;
+    if(p){
+      document.getElementById('btnDeleteProduct').onclick = async ()=>{
+        if(confirm('এই পণ্যটি মুছে ফেলতে চান?')){
+          products = products.filter(x=>x.id!==id);
+          await saveProducts();
+          await saveProductImage(id, null);
+          delete productImages[id];
+          closeModal(); renderAll();
+        }
+      };
+    }
+    document.getElementById('btnSaveProduct').onclick = async ()=>{
+      const name = nameField.value.trim();
+      if(!name){ alert('পণ্যের নাম লিখুন।'); return; }
+      const type = typeField.value;
+      const design = designField.value.trim();
+      const price = Number(priceField.value)||0;
+      const stock = Number(stockField.value)||0;
+      const note = noteField.value.trim();
+      const image = draft.image;
+      const themeId = draft.themeId || null;
+      let targetId = id;
+      if(p){
+        Object.assign(p, {name,type,design,price,stock,note,themeId});
+      } else {
+        targetId = uid();
+        products.push({id:targetId, name,type,design,price,stock,note,themeId, createdAt:Date.now()});
+      }
+      await saveProducts();
+      await saveProductImage(targetId, image);
+      if(image) productImages[targetId] = image; else delete productImages[targetId];
+      closeModal(); renderAll();
+    };
+  }
+
+  // ---------- theme modal ----------
+  function openThemeModal(id){
+    const t = id ? themes.find(x=>x.id===id) : null;
+    const draft = t ? {name:t.name, note:t.note||'', image:themeImages[t.id]||null} : {name:'', note:'', image:null};
+    renderThemeForm(id, draft);
+  }
+
+  function renderThemeForm(id, draft){
+    const t = id ? themes.find(x=>x.id===id) : null;
+    openModal(`
+      <h2>${t?'থিম সম্পাদনা':'নতুন থিম যোগ করুন'}</h2>
+      <div class="field">
+        <label>থিমের ছবি</label>
+        <div class="img-field">
+          <div id="th-image-preview" style="cursor:pointer;">${draft.image?`<img class="img-preview" src="${draft.image}" alt="">`:`<div class="img-preview placeholder">কোনো ছবি নেই</div>`}</div>
+          <div class="img-buttons">
+            <label class="btn btn-ghost" for="th-image-input" id="th-image-label">${draft.image?'ছবি পরিবর্তন করুন':'ছবি বাছাই করুন'}</label>
+            <input type="file" id="th-image-input" accept="image/*">
+            <button class="btn btn-ghost" id="btnRemoveThemeImage" style="display:${draft.image?'block':'none'};">ছবি মুছুন</button>
+          </div>
+        </div>
+        <p style="font-size:12px;color:var(--ink-soft);margin:6px 0 0;">ছবির উপর চাপলে এডিট টুল খুলবে (ঘোরানো, উজ্জ্বলতা, ফিল্টার, AI নাম সাজেশন)।</p>
+      </div>
+      <div class="field"><label>থিমের নাম</label><input id="th-name" value="${escapeHtml(draft.name)}" placeholder="যেমন: জামদানি মোটিফ"></div>
+      <div class="field"><label>নোট</label><textarea id="th-note" placeholder="ঐচ্ছিক">${escapeHtml(draft.note)}</textarea></div>
+      <div class="btn-row">
+        ${t?`<button class="btn btn-danger" id="btnDeleteTheme">মুছে ফেলুন</button>`:''}
+        <button class="btn btn-ghost" id="btnCancel">বাতিল</button>
+        <button class="btn btn-primary" id="btnSaveTheme">সংরক্ষণ করুন</button>
+      </div>
+    `);
+
+    const imgInput = document.getElementById('th-image-input');
+    const imgPreview = document.getElementById('th-image-preview');
+    const imgLabel = document.getElementById('th-image-label');
+    const removeBtn = document.getElementById('btnRemoveThemeImage');
+    const nameField = document.getElementById('th-name');
+    const noteField = document.getElementById('th-note');
+
+    nameField.addEventListener('input', e=>draft.name=e.target.value);
+    noteField.addEventListener('input', e=>draft.note=e.target.value);
+
+    imgPreview.addEventListener('click', ()=>{
+      if(draft.image){
+        openImageEditor(draft.image, draft, (edited)=>{ draft.image = edited; renderThemeForm(id, draft); }, ()=>renderThemeForm(id, draft));
+      } else {
+        imgInput.click();
+      }
+    });
+    imgInput.addEventListener('change', async ()=>{
+      const file = imgInput.files && imgInput.files[0];
+      if(!file) return;
+      try{
+        draft.image = await resizeImage(file, 480, 0.62);
+        imgPreview.innerHTML = `<img class="img-preview" src="${draft.image}" alt="">`;
+        imgLabel.textContent = 'ছবি পরিবর্তন করুন';
+        removeBtn.style.display = 'block';
+      }catch(err){
+        alert('ছবি প্রক্রিয়া করতে সমস্যা হয়েছে, আবার চেষ্টা করুন।');
+      }
+    });
+    removeBtn.addEventListener('click', ()=>{
+      draft.image = null;
+      imgInput.value = '';
+      imgPreview.innerHTML = `<div class="img-preview placeholder">কোনো ছবি নেই</div>`;
+      imgLabel.textContent = 'ছবি বাছাই করুন';
+      removeBtn.style.display = 'none';
+    });
+
+    document.getElementById('btnCancel').onclick = closeModal;
+    if(t){
+      document.getElementById('btnDeleteTheme').onclick = async ()=>{
+        if(confirm('এই থিমটি মুছে ফেলতে চান? এই থিম কোনো পণ্যে যুক্ত থাকলে সেই যোগসূত্র সরে যাবে।')){
+          themes = themes.filter(x=>x.id!==id);
+          products.forEach(p=>{ if(p.themeId===id) p.themeId=null; });
+          await saveThemes(); await saveProducts();
+          await saveThemeImage(id, null);
+          delete themeImages[id];
+          closeModal(); renderAll();
+        }
+      };
+    }
+    document.getElementById('btnSaveTheme').onclick = async ()=>{
+      const name = nameField.value.trim();
+      if(!name){ alert('থিমের নাম লিখুন।'); return; }
+      const note = noteField.value.trim();
+      const image = draft.image;
+      let targetId = id;
+      if(t){
+        Object.assign(t, {name,note});
+      } else {
+        targetId = uid();
+        themes.push({id:targetId, name,note, createdAt:Date.now()});
+      }
+      await saveThemes();
+      await saveThemeImage(targetId, image);
+      if(image) themeImages[targetId] = image; else delete themeImages[targetId];
+      closeModal(); renderAll();
+    };
+  }
+
+  // ---------- image editor ----------
+  function openImageEditor(imageDataUrl, draft, onApply, onCancel){
+    openModal(`
+      <h2>ছবি এডিট করুন</h2>
+      <div style="background:#1a1214;border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center;margin-bottom:14px;padding:8px;">
+        <canvas id="editCanvas" style="max-width:100%;max-height:280px;display:block;border-radius:6px;"></canvas>
+      </div>
+      <div class="field"><label>উজ্জ্বলতা</label><input type="range" id="rangeBrightness" min="50" max="150" value="100" style="width:100%;"></div>
+      <div class="field"><label>কনট্রাস্ট</label><input type="range" id="rangeContrast" min="50" max="150" value="100" style="width:100%;"></div>
+      <div class="chip-row" id="filterChips">
+        <button class="chip active" data-filter="none">স্বাভাবিক</button>
+        <button class="chip" data-filter="grayscale">সাদাকালো</button>
+        <button class="chip" data-filter="sepia">সেপিয়া</button>
+        <button class="chip" data-filter="vivid">উজ্জ্বল রঙ</button>
+      </div>
+      <div class="btn-row" style="margin-top:2px;">
+        <button class="btn btn-ghost" id="btnRotateEdit">⟳ ৯০° ঘোরান</button>
+        <button class="btn btn-ghost" id="btnResetEdit">রিসেট</button>
+      </div>
+      <div class="field" style="margin-top:14px;">
+        <label>AI সহায়তা</label>
+        <button class="btn btn-ghost btn-block" id="btnAiSuggest">✨ AI দিয়ে নাম সাজেশন নিন</button>
+        <div id="aiResult" style="font-size:13px;color:var(--ink-soft);margin-top:8px;"></div>
+        <p style="font-size:11.5px;color:var(--ink-soft);margin:6px 0 0;">এটি ছবি বিশ্লেষণ করে নামের সাজেশন দেয়। সত্যিকারের ছবি রিটাচ (ব্যাকগ্রাউন্ড সরানো, দাগ মোছা ইত্যাদি) এই অফলাইন অ্যাপে সম্ভব নয় — উপরের টুলগুলো (ঘোরানো, উজ্জ্বলতা, ফিল্টার) দিয়ে বেসিক এডিট করা যাবে।</p>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" id="btnCancelEdit">বাতিল</button>
+        <button class="btn btn-primary" id="btnApplyEdit">প্রয়োগ করুন</button>
+      </div>
+    `);
+
+    const canvas = document.getElementById('editCanvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    let rotation = 0;
+    let currentFilter = 'none';
+
+    function draw(){
+      const swap = rotation%180!==0;
+      canvas.width = swap ? img.height : img.width;
+      canvas.height = swap ? img.width : img.height;
+      ctx.save();
+      ctx.translate(canvas.width/2, canvas.height/2);
+      ctx.rotate(rotation*Math.PI/180);
+      const b = document.getElementById('rangeBrightness').value;
+      const c = document.getElementById('rangeContrast').value;
+      let f = `brightness(${b}%) contrast(${c}%)`;
+      if(currentFilter==='grayscale') f += ' grayscale(100%)';
+      else if(currentFilter==='sepia') f += ' sepia(80%)';
+      else if(currentFilter==='vivid') f += ' saturate(180%)';
+      ctx.filter = f;
+      ctx.drawImage(img, -img.width/2, -img.height/2, img.width, img.height);
+      ctx.restore();
+    }
+    img.onload = draw;
+    img.src = imageDataUrl;
+
+    document.getElementById('rangeBrightness').addEventListener('input', draw);
+    document.getElementById('rangeContrast').addEventListener('input', draw);
+    document.getElementById('btnRotateEdit').addEventListener('click', ()=>{ rotation=(rotation+90)%360; draw(); });
+    document.getElementById('btnResetEdit').addEventListener('click', ()=>{
+      rotation=0; currentFilter='none';
+      document.getElementById('rangeBrightness').value=100;
+      document.getElementById('rangeContrast').value=100;
+      document.querySelectorAll('#filterChips .chip').forEach(c=>c.classList.toggle('active', c.dataset.filter==='none'));
+      draw();
+    });
+    document.getElementById('filterChips').addEventListener('click', e=>{
+      const chip = e.target.closest('.chip');
+      if(!chip) return;
+      currentFilter = chip.dataset.filter;
+      document.querySelectorAll('#filterChips .chip').forEach(c=>c.classList.toggle('active', c===chip));
+      draw();
+    });
+
+    document.getElementById('btnAiSuggest').addEventListener('click', async ()=>{
+      const btn = document.getElementById('btnAiSuggest');
+      const resultEl = document.getElementById('aiResult');
+      btn.disabled = true; btn.textContent = 'বিশ্লেষণ করা হচ্ছে...';
+      resultEl.textContent = '';
+      try{
+        const b64 = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
+        const response = await fetch('https://api.anthropic.com/v1/messages', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({
+            model:'claude-sonnet-4-6',
+            max_tokens: 100,
+            messages:[{
+              role:'user',
+              content:[
+                {type:'image', source:{type:'base64', media_type:'image/jpeg', data:b64}},
+                {type:'text', text:'এই ছবিটি (কাপড়ের ডিজাইন বা থিমের ছবি হতে পারে) দেখে বাংলায় একটি ছোট, আকর্ষণীয় নাম বলুন (সর্বোচ্চ ৫ শব্দ)। শুধু নামটি লিখুন, অন্য কোনো ব্যাখ্যা বা অতিরিক্ত টেক্সট লিখবেন না।'}
+              ]
+            }]
+          })
+        });
+        const data = await response.json();
+        const text = ((data.content)||[]).map(c=>c.text||'').join('').trim();
+        if(text){
+          resultEl.innerHTML = `সাজেশন: <b>${escapeHtml(text)}</b> &nbsp; <button class="btn btn-ghost" id="btnUseSuggestion" style="padding:6px 10px;font-size:12.5px;">নামে বসান</button>`;
+          document.getElementById('btnUseSuggestion').onclick = ()=>{
+            draft.name = text;
+            resultEl.innerHTML += '<br><span style="color:var(--good);">নামের ঘরে বসানো হয়েছে।</span>';
+          };
+        } else {
+          resultEl.textContent = 'সাজেশন পাওয়া যায়নি, আবার চেষ্টা করুন।';
+        }
+      }catch(err){
+        resultEl.textContent = 'AI সংযোগে সমস্যা হয়েছে। ইন্টারনেট সংযোগ পরীক্ষা করুন।';
+      } finally {
+        btn.disabled = false; btn.textContent = '✨ AI দিয়ে নাম সাজেশন নিন';
+      }
+    });
+
+    document.getElementById('btnCancelEdit').onclick = onCancel;
+    document.getElementById('btnApplyEdit').onclick = ()=>{
+      const edited = canvas.toDataURL('image/jpeg', 0.85);
+      onApply(edited);
+    };
+  }
+
+  // ---------- sale modal ----------
+  function openSaleModal(){
+    if(!products.length){
+      openModal(`<h2>নতুন বিক্রয়</h2><div class="empty-state"><span>👗</span>প্রথমে পণ্য যোগ করুন,<br>তারপর বিক্রয় লিখতে পারবেন।</div>
+      <div class="btn-row"><button class="btn btn-primary btn-block" id="btnGoProducts">পণ্য যোগ করুন</button></div>`);
+      document.getElementById('btnGoProducts').onclick = ()=>{ closeModal(); switchView('products'); openProductModal(null); };
+      return;
+    }
+    openModal(`
+      <h2>নতুন বিক্রয় লিখুন</h2>
+      <div class="field"><label>পণ্য বাছাই করুন</label>
+        <select id="s-product">
+          ${products.map(p=>`<option value="${p.id}" ${p.stock<=0?'disabled':''}>${escapeHtml(p.name)} (মজুদ ${bn(p.stock)}) — ${escapeHtml(p.type)}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>পরিমাণ</label><input id="s-qty" type="number" inputmode="numeric" value="1" min="1"></div>
+        <div class="field"><label>একক মূল্য (৳)</label><input id="s-price" type="number" inputmode="decimal"></div>
+      </div>
+      <div class="readonly-total"><span>মোট মূল্য</span><b id="s-total">৳০</b></div>
+      <div class="field"><label>ক্রেতার নাম</label><input id="s-customer" placeholder="ক্রেতার নাম লিখুন"></div>
+      <div class="field"><label>ফোন নম্বর</label><input id="s-phone" placeholder="ঐচ্ছিক"></div>
+      <div class="field"><label>পরিশোধিত পরিমাণ (৳)</label><input id="s-paid" type="number" inputmode="decimal" value="0"></div>
+      <div class="due-line"><span>বাকি থাকবে</span><b id="s-due">৳০</b></div>
+      <div class="field"><label>তারিখ</label><input id="s-date" type="date" value="${todayStr()}"></div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" id="btnCancel">বাতিল</button>
+        <button class="btn btn-primary" id="btnSaveSale">বিক্রয় সংরক্ষণ করুন</button>
+      </div>
+    `);
+    const selEl = document.getElementById('s-product');
+    const qtyEl = document.getElementById('s-qty');
+    const priceEl = document.getElementById('s-price');
+    const paidEl = document.getElementById('s-paid');
+    function currentProduct(){ return products.find(p=>p.id===selEl.value); }
+    function fillPrice(){ const p=currentProduct(); if(p){ priceEl.value = p.price; recalc(); } }
+    function recalc(){
+      const total = (Number(qtyEl.value)||0) * (Number(priceEl.value)||0);
+      document.getElementById('s-total').textContent = taka(total);
+      const paid = Number(paidEl.value)||0;
+      const due = Math.max(total-paid,0);
+      document.getElementById('s-due').textContent = taka(due);
+      if(paid===0){ paidEl.value = paid; }
+    }
+    selEl.addEventListener('change', fillPrice);
+    qtyEl.addEventListener('input', recalc);
+    priceEl.addEventListener('input', recalc);
+    paidEl.addEventListener('input', recalc);
+    fillPrice();
+    paidEl.value = priceEl.value; recalc(); // default: fully paid, editable
+    document.getElementById('btnCancel').onclick = closeModal;
+    document.getElementById('btnSaveSale').onclick = async ()=>{
+      const product = currentProduct();
+      const qty = Number(qtyEl.value)||0;
+      const unitPrice = Number(priceEl.value)||0;
+      const customerName = document.getElementById('s-customer').value.trim();
+      const phone = document.getElementById('s-phone').value.trim();
+      const paid = Number(paidEl.value)||0;
+      const date = document.getElementById('s-date').value || todayStr();
+      if(!product){ alert('পণ্য বাছাই করুন।'); return; }
+      if(qty<1){ alert('সঠিক পরিমাণ লিখুন।'); return; }
+      if(qty>product.stock){ alert('মজুদের চেয়ে বেশি পরিমাণ লেখা যাবে না। বর্তমান মজুদ: '+bn(product.stock)); return; }
+      if(!customerName){ alert('ক্রেতার নাম লিখুন।'); return; }
+      const total = qty*unitPrice;
+      const due = Math.max(total-paid,0);
+      const sale = {
+        id:uid(), productId:product.id, productName:product.name, type:product.type,
+        qty, unitPrice, total, paid:Math.min(paid,total), due, customerName, customerPhone:phone,
+        date, payments:[]
+      };
+      sales.push(sale);
+      product.stock -= qty;
+      await saveProducts(); await saveSales();
+      closeModal(); renderAll();
+    };
+  }
+
+  // ---------- sale detail modal ----------
+  function openSaleDetail(id){
+    const s = sales.find(x=>x.id===id);
+    if(!s) return;
+    const prod = products.find(p=>p.id===s.productId);
+    const themeName = (prod&&prod.themeId) ? themeNameById(prod.themeId) : null;
+    openModal(`
+      <h2>বিক্রয়ের বিবরণ</h2>
+      ${(prod&&productImages[prod.id])?`<img class="detail-image" src="${productImages[prod.id]}" alt="">`:''}
+      <div class="detail-row"><span>পণ্য</span><span>${escapeHtml(s.productName)} (${escapeHtml(s.type||'')})</span></div>
+      ${themeName?`<div class="detail-row"><span>থিম</span><span>${escapeHtml(themeName)}</span></div>`:''}
+      <div class="detail-row"><span>ক্রেতা</span><span>${escapeHtml(s.customerName)}</span></div>
+      <div class="detail-row"><span>ফোন</span><span>${s.customerPhone?escapeHtml(s.customerPhone):'—'}</span></div>
+      <div class="detail-row"><span>তারিখ</span><span>${fmtDate(s.date)}</span></div>
+      <div class="detail-row"><span>পরিমাণ</span><span>${bn(s.qty)} পিস</span></div>
+      <div class="detail-row"><span>একক মূল্য</span><span>${taka(s.unitPrice)}</span></div>
+      <div class="detail-row"><span>মোট</span><span>${taka(s.total)}</span></div>
+      <div class="detail-row"><span>পরিশোধিত</span><span>${taka(s.paid)}</span></div>
+      <div class="detail-row"><span>বাকি</span><span style="color:${s.due>0?'var(--danger)':'var(--good)'}">${taka(s.due)}</span></div>
+      <div class="btn-row">
+        <button class="btn btn-danger" id="btnDeleteSale">মুছে ফেলুন</button>
+        ${s.due>0?'<button class="btn btn-primary" id="btnPaySale">বাকি পরিশোধ</button>':'<button class="btn btn-ghost" id="btnCloseD">বন্ধ করুন</button>'}
+      </div>
+    `);
+    const closeBtn = document.getElementById('btnCloseD');
+    if(closeBtn) closeBtn.onclick = closeModal;
+    document.getElementById('btnDeleteSale').onclick = async ()=>{
+      if(confirm('এই বিক্রয়টি মুছে ফেলতে চান? পণ্যের মজুদ ফিরিয়ে দেওয়া হবে।')){
+        const prod = products.find(p=>p.id===s.productId);
+        if(prod) prod.stock += s.qty;
+        sales = sales.filter(x=>x.id!==id);
+        await saveProducts(); await saveSales();
+        closeModal(); renderAll();
+      }
+    };
+    const payBtn = document.getElementById('btnPaySale');
+    if(payBtn) payBtn.onclick = ()=>openPaymentModal(s.customerName+'|'+(s.customerPhone||''), id);
+  }
+
+  // ---------- payment modal (settle dues) ----------
+  function openPaymentModal(customerKey, focusSaleId){
+    const [name, phone] = customerKey.split('|');
+    const dueSales = sales.filter(s=> s.customerName===name && (s.customerPhone||'')===phone && s.due>0)
+                           .sort((a,b)=> a.date.localeCompare(b.date));
+    if(!dueSales.length){ closeModal(); return; }
+    const totalDue = dueSales.reduce((sum,s)=>sum+s.due,0);
+    openModal(`
+      <h2>বাকি পরিশোধ — ${escapeHtml(name)}</h2>
+      <div class="readonly-total"><span>মোট বাকি</span><b>${taka(totalDue)}</b></div>
+      <div class="field"><label>পরিশোধের পরিমাণ (৳)</label><input id="pay-amount" type="number" inputmode="decimal" value="${totalDue}"></div>
+      <div class="field"><label>তারিখ</label><input id="pay-date" type="date" value="${todayStr()}"></div>
+      <p style="font-size:12.5px;color:var(--ink-soft);margin-top:-4px;">পুরনো হিসাব থেকে ক্রমান্বয়ে সমন্বয় করা হবে।</p>
+      <div class="btn-row">
+        <button class="btn btn-ghost" id="btnCancel">বাতিল</button>
+        <button class="btn btn-primary" id="btnConfirmPay">পরিশোধ নিশ্চিত করুন</button>
+      </div>
+    `);
+    document.getElementById('btnCancel').onclick = closeModal;
+    document.getElementById('btnConfirmPay').onclick = async ()=>{
+      let amount = Number(document.getElementById('pay-amount').value)||0;
+      const date = document.getElementById('pay-date').value || todayStr();
+      if(amount<=0){ alert('সঠিক পরিমাণ লিখুন।'); return; }
+      for(const s of dueSales){
+        if(amount<=0) break;
+        const applied = Math.min(amount, s.due);
+        s.paid += applied;
+        s.due -= applied;
+        s.payments = s.payments || [];
+        s.payments.push({amount:applied, date});
+        amount -= applied;
+      }
+      await saveSales();
+      closeModal(); renderAll();
+    };
+  }
+
+  // ---------- delegated clicks on lists ----------
+  document.getElementById('app').addEventListener('click', e=>{
+    const el = e.target.closest('[data-action]');
+    if(!el) return;
+    const action = el.dataset.action;
+    if(action==='open-product') openProductModal(el.dataset.id);
+    else if(action==='open-theme') openThemeModal(el.dataset.id);
+    else if(action==='open-sale') openSaleDetail(el.dataset.id);
+    else if(action==='open-due') openPaymentModal(el.dataset.key);
+  });
+
+  // ---------- settings & catalog export ----------
+  function openSettingsModal(){
+    openModal(`
+      <h2>সেটিংস ও ক্যাটালগ</h2>
+
+      <div class="field" style="background:var(--gold-soft);border-radius:10px;padding:12px;margin-bottom:16px;">
+        <label>পুরনো ব্যাকআপ থেকে পুনরুদ্ধার করুন</label>
+        <p style="font-size:12.5px;color:var(--ink-soft);margin:0 0 10px;">আগে ডাউনলোড করা বা GitHub-এ থাকা catalog-data.json ফাইল থেকে পণ্য, থিম ও ছবি ফিরিয়ে আনুন।</p>
+        <input type="file" id="restore-file-input" accept=".json,application/json" style="display:none;">
+        <label class="btn btn-ghost btn-block" for="restore-file-input" style="margin-bottom:0;">📥 ব্যাকআপ ফাইল বেছে নিন</label>
+        <div id="restoreResult" style="font-size:13px;margin-top:8px;"></div>
+      </div>
+
+      <div class="field"><label>দোকানের নাম</label><input id="set-name" value="${escapeHtml(shopSettings.shopName)}"></div>
+      <div class="field"><label>ট্যাগলাইন</label><input id="set-tagline" value="${escapeHtml(shopSettings.tagline)}"></div>
+      <div class="field"><label>WhatsApp নম্বর</label><input id="set-phone" value="${escapeHtml(shopSettings.phone)}" placeholder="যেমন: 8801XXXXXXXXX"></div>
+      <div class="field"><label>Messenger ইউজারনেম / লিংক</label><input id="set-messenger" value="${escapeHtml(shopSettings.messenger)}" placeholder="ঐচ্ছিক"></div>
+      <div class="field"><label>ঠিকানা</label><input id="set-address" value="${escapeHtml(shopSettings.address)}" placeholder="ঐচ্ছিক"></div>
+      <div class="field"><label>ক্যাটালগ ওয়েবসাইট লিংক</label><input id="set-catalog-url" value="${escapeHtml(shopSettings.catalogUrl)}" placeholder="যেমন: https://ruchiramahbub.github.io/anchal-catalog/catalog.html"></div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" id="btnCancel">বাতিল</button>
+        <button class="btn btn-primary" id="btnSaveSettings">সংরক্ষণ করুন</button>
+      </div>
+
+      <div class="field" style="margin-top:20px;border-top:1px solid var(--line);padding-top:16px;">
+        <label>ক্লায়েন্টদের জন্য ক্যাটালগ — ডাউনলোড করে</label>
+        <p style="font-size:12.5px;color:var(--ink-soft);margin:0 0 10px;">সব পণ্য ও থিমের তথ্য একটি ফাইলে (catalog-data.json) ডাউনলোড হবে, যা হাতে GitHub-এ আপলোড করতে হবে।</p>
+        <button class="btn btn-ghost btn-block" id="btnExportCatalog">📤 ক্যাটালগ ডাউনলোড করুন</button>
+      </div>
+
+      <div class="field" style="margin-top:16px;border-top:1px solid var(--line);padding-top:16px;">
+        <label>ক্লায়েন্টদের জন্য ক্যাটালগ — সরাসরি GitHub-এ পাঠান</label>
+        <p style="font-size:12.5px;color:var(--ink-soft);margin:0 0 10px;">একবার নিচের তথ্য দিয়ে রাখলে, পরে শুধু এক ট্যাপেই ওয়েবসাইট আপডেট হয়ে যাবে — ডাউনলোড-আপলোডের ঝামেলা লাগবে না।</p>
+        <div class="field"><label>GitHub ইউজারনেম</label><input id="gh-user" value="${escapeHtml(shopSettings.githubUser)}" placeholder="যেমন: ruchiramahbub"></div>
+        <div class="field"><label>রিপোজিটরির নাম</label><input id="gh-repo" value="${escapeHtml(shopSettings.githubRepo)}" placeholder="যেমন: anchal-catalog"></div>
+        <div class="field"><label>ফাইলের নাম</label><input id="gh-path" value="${escapeHtml(shopSettings.githubPath||'catalog-data.json')}"></div>
+        <div class="field"><label>Personal Access Token</label><input id="gh-token" type="password" value="${escapeHtml(shopSettings.githubToken)}" placeholder="GitHub থেকে তৈরি করা টোকেন"></div>
+        <p style="font-size:11.5px;color:var(--ink-soft);margin:2px 0 10px;">টোকেন বানাতে: GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens → শুধু এই রিপোজিটরি বেছে নিয়ে Permissions-এ "Contents: Read and write" চালু করুন। টোকেন শুধু আপনার ফোনেই সংরক্ষিত থাকে, GitHub ছাড়া অন্য কোথাও যায় না — কাউকে শেয়ার করবেন না।</p>
+        <button class="btn btn-primary btn-block" id="btnGithubSync">🔄 GitHub-এ সরাসরি সিঙ্ক করুন</button>
+        <div id="githubSyncResult" style="font-size:13px;margin-top:8px;"></div>
+      </div>
+    `);
+    document.getElementById('btnCancel').onclick = closeModal;
+    document.getElementById('restore-file-input').addEventListener('change', async (e)=>{
+      const file = e.target.files && e.target.files[0];
+      if(file) await importFromCatalogFile(file);
+    });
+    document.getElementById('btnSaveSettings').onclick = async ()=>{
+      shopSettings.shopName = document.getElementById('set-name').value.trim() || 'আঁচল';
+      shopSettings.tagline = document.getElementById('set-tagline').value.trim();
+      shopSettings.phone = document.getElementById('set-phone').value.trim();
+      shopSettings.messenger = document.getElementById('set-messenger').value.trim();
+      shopSettings.address = document.getElementById('set-address').value.trim();
+      shopSettings.catalogUrl = document.getElementById('set-catalog-url').value.trim();
+      await saveShopSettings();
+      closeModal();
+    };
+    document.getElementById('btnExportCatalog').onclick = exportCatalogData;
+    document.getElementById('btnGithubSync').onclick = syncToGithub;
+  }
+
+  async function importFromCatalogFile(file){
+    const resultEl = document.getElementById('restoreResult');
+    resultEl.textContent = 'পড়া হচ্ছে...';
+    try{
+      const text = await file.text();
+      const data = JSON.parse(text);
+      if(!data || (!Array.isArray(data.products) && !Array.isArray(data.themes))){
+        resultEl.innerHTML = '<span style="color:var(--danger);">এটি সঠিক ক্যাটালগ ব্যাকআপ ফাইল বলে মনে হচ্ছে না।</span>';
+        return;
+      }
+      let importedThemes = 0, importedProducts = 0, skippedThemes = 0, skippedProducts = 0;
+      if(Array.isArray(data.themes)){
+        for(const t of data.themes){
+          if(!t || !t.id){ continue; }
+          if(themes.some(x=>x.id===t.id)){ skippedThemes++; continue; }
+          themes.push({id:t.id, name:t.name||'থিম', note:t.note||'', createdAt:Date.now()});
+          if(t.image){ themeImages[t.id] = t.image; await saveThemeImage(t.id, t.image); }
+          importedThemes++;
+        }
+        await saveThemes();
+      }
+      if(Array.isArray(data.products)){
+        for(const p of data.products){
+          if(!p || !p.id){ continue; }
+          if(products.some(x=>x.id===p.id)){ skippedProducts++; continue; }
+          products.push({id:p.id, name:p.name||'পণ্য', type:p.type||'অন্যান্য', design:p.design||'', price:Number(p.price)||0, stock:Number(p.stock)||0, note:p.note||'', themeId:p.themeId||null, createdAt:Date.now()});
+          if(p.image){ productImages[p.id] = p.image; await saveProductImage(p.id, p.image); }
+          importedProducts++;
+        }
+        await saveProducts();
+      }
+      if(data.shopName) shopSettings.shopName = data.shopName;
+      if(data.tagline) shopSettings.tagline = data.tagline;
+      if(data.phone) shopSettings.phone = data.phone;
+      if(data.messenger) shopSettings.messenger = data.messenger;
+      if(data.address) shopSettings.address = data.address;
+      await saveShopSettings();
+      renderAll();
+      let msg = `✅ পুনরুদ্ধার সম্পন্ন — ${bn(importedProducts)}টি পণ্য ও ${bn(importedThemes)}টি থিম যোগ হয়েছে।`;
+      if(skippedProducts || skippedThemes) msg += ` (${bn(skippedProducts+skippedThemes)}টি আগে থেকেই ছিল, বাদ দেওয়া হয়েছে।)`;
+      resultEl.innerHTML = `<span style="color:var(--good);">${msg}</span>`;
+    }catch(e){
+      resultEl.innerHTML = '<span style="color:var(--danger);">ফাইলটি পড়তে সমস্যা হয়েছে। সঠিক catalog-data.json ফাইল কিনা দেখুন।</span>';
+    }
+  }
+
+  function buildCatalogData(){
+    return {
+      isSample: false,
+      shopName: shopSettings.shopName || 'আঁচল',
+      tagline: shopSettings.tagline || '',
+      phone: shopSettings.phone || '',
+      messenger: shopSettings.messenger || '',
+      address: shopSettings.address || '',
+      updatedAt: new Date().toISOString(),
+      themes: themes.map(t=>({id:t.id, name:t.name, note:t.note||'', image:themeImages[t.id]||null})),
+      products: products.map(p=>({id:p.id, name:p.name, type:p.type, design:p.design||'', price:p.price, stock:p.stock, note:p.note||'', themeId:p.themeId||null, image:productImages[p.id]||null}))
+    };
+  }
+
+  function exportCatalogData(){
+    try{
+      const blob = new Blob([JSON.stringify(buildCatalogData())], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'catalog-data.json';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }catch(e){
+      alert('ফাইল ডাউনলোড করতে সমস্যা হয়েছে। ব্রাউজারের ডাউনলোড অনুমতি চেক করুন।');
+    }
+  }
+
+  function utf8ToBase64(str){
+    return btoa(unescape(encodeURIComponent(str)));
+  }
+
+  async function syncToGithub(){
+    const btn = document.getElementById('btnGithubSync');
+    const resultEl = document.getElementById('githubSyncResult');
+    const user = document.getElementById('gh-user').value.trim();
+    const repo = document.getElementById('gh-repo').value.trim();
+    const token = document.getElementById('gh-token').value.trim();
+    const path = document.getElementById('gh-path').value.trim() || 'catalog-data.json';
+    if(!user || !repo || !token){
+      resultEl.innerHTML = '<span style="color:var(--danger);">ইউজারনেম, রিপোজিটরি ও টোকেন — সবগুলো দিন।</span>';
+      return;
+    }
+    btn.disabled = true; btn.textContent = 'পাঠানো হচ্ছে...';
+    resultEl.textContent = '';
+    try{
+      const contentB64 = utf8ToBase64(JSON.stringify(buildCatalogData()));
+      const apiUrl = `https://api.github.com/repos/${encodeURIComponent(user)}/${encodeURIComponent(repo)}/contents/${path}`;
+      let sha = null;
+      try{
+        const getRes = await fetch(apiUrl, { headers: { 'Authorization':'token '+token, 'Accept':'application/vnd.github+json' } });
+        if(getRes.ok){ const getJson = await getRes.json(); sha = getJson.sha; }
+      }catch(e){ /* file may not exist yet — that's fine */ }
+      const putBody = { message:'ক্যাটালগ আপডেট — আঁচল খাতা থেকে', content: contentB64 };
+      if(sha) putBody.sha = sha;
+      const putRes = await fetch(apiUrl, {
+        method:'PUT',
+        headers: { 'Authorization':'token '+token, 'Accept':'application/vnd.github+json', 'Content-Type':'application/json' },
+        body: JSON.stringify(putBody)
+      });
+      if(putRes.ok){
+        resultEl.innerHTML = '<span style="color:var(--good);">✅ সফলভাবে GitHub-এ পাঠানো হয়েছে। ১-২ মিনিট পর ওয়েবসাইটে দেখা যাবে।</span>';
+        shopSettings.githubUser = user; shopSettings.githubRepo = repo; shopSettings.githubToken = token; shopSettings.githubPath = path;
+        await saveShopSettings();
+      } else {
+        let msg = 'অজানা সমস্যা';
+        try{ const errJson = await putRes.json(); msg = errJson.message || msg; }catch(e){}
+        resultEl.innerHTML = `<span style="color:var(--danger);">সমস্যা হয়েছে (${putRes.status}): ${escapeHtml(msg)}</span>`;
+      }
+    }catch(e){
+      resultEl.innerHTML = '<span style="color:var(--danger);">ইন্টারনেট সংযোগ বা টোকেনে সমস্যা হয়েছে। আবার চেষ্টা করুন।</span>';
+    } finally {
+      btn.disabled = false; btn.textContent = '🔄 GitHub-এ সরাসরি সিঙ্ক করুন';
+    }
+  }
+  document.getElementById('btnSettings').addEventListener('click', openSettingsModal);
+
+  function shareCatalogOnFacebook(){
+    let url = (shopSettings.catalogUrl||'').trim();
+    if(!url){
+      try{ url = new URL('catalog.html', window.location.href).href; }catch(e){ url=''; }
+    }
+    if(!url || url.startsWith('file:')){
+      alert('আগে সেটিংসে গিয়ে "ক্যাটালগ ওয়েবসাইট লিংক" ঘরে আপনার catalog.html-এর সম্পূর্ণ ঠিকানা (যেমন: https://...github.io/.../catalog.html) বসিয়ে সংরক্ষণ করুন।');
+      openSettingsModal();
+      return;
+    }
+    const shareUrl = 'https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(url);
+    window.open(shareUrl, '_blank', 'noopener');
+  }
+  document.getElementById('btnShareFacebook').addEventListener('click', shareCatalogOnFacebook);
+
+  // ---------- init ----------
+  function setTodayLine(){
+    document.getElementById('todayLine').textContent = 'আজ, ' + fmtDate(new Date());
+  }
+  setTodayLine();
+  loadAll();
+
+})();
+</script>
+</body>
+</html>
