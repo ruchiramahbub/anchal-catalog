@@ -56,7 +56,8 @@
     border-radius:0 0 18px 18px;
   }
   .header-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
-  .header-icon-btn{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.32);color:#fff;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;padding:0;}
+  .header-icon-btn{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.32);color:#fff;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;padding:0;text-decoration:none;}
+  .header-pill-btn{width:auto;border-radius:999px;padding:0 14px;font-family:'Baloo Da 2',sans-serif;font-size:13px;font-weight:600;}
   .header-icon-btn svg{width:18px;height:18px;}
   .brand-row{display:flex;align-items:center;gap:10px;}
   .brand-mark{
@@ -357,9 +358,12 @@
           <p class="brand-sub">শাড়ী · কামিজ · ওড়নার বিক্রয় ও হিসাব</p>
         </div>
       </div>
-      <button class="header-icon-btn" id="btnSettings" aria-label="সেটিংস ও ক্যাটালগ এক্সপোর্ট">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M19.4 13a7.6 7.6 0 0 0 0-2l2-1.5-2-3.5-2.4 1a7.6 7.6 0 0 0-1.7-1L15 3h-4l-.3 2.5a7.6 7.6 0 0 0-1.7 1l-2.4-1-2 3.5L6.6 11a7.6 7.6 0 0 0 0 2l-2 1.5 2 3.5 2.4-1a7.6 7.6 0 0 0 1.7 1L11 21h4l.3-2.5a7.6 7.6 0 0 0 1.7-1l2.4 1 2-3.5z"/></svg>
-      </button>
+      <div style="display:flex;gap:8px;flex:none;">
+        <a class="header-icon-btn header-pill-btn" href="./catalog.html" target="_blank" rel="noopener" aria-label="আঁচল ক্যাটালগ দেখুন">আঁচল</a>
+        <button class="header-icon-btn" id="btnSettings" aria-label="সেটিংস ও ক্যাটালগ এক্সপোর্ট">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M19.4 13a7.6 7.6 0 0 0 0-2l2-1.5-2-3.5-2.4 1a7.6 7.6 0 0 0-1.7-1L15 3h-4l-.3 2.5a7.6 7.6 0 0 0-1.7 1l-2.4-1-2 3.5L6.6 11a7.6 7.6 0 0 0 0 2l-2 1.5 2 3.5 2.4-1a7.6 7.6 0 0 0 1.7 1L11 21h4l.3-2.5a7.6 7.6 0 0 0 1.7-1l2.4 1 2-3.5z"/></svg>
+        </button>
+      </div>
     </div>
     <div class="today-line" id="todayLine"></div>
   </header>
@@ -384,6 +388,11 @@
         </div>
       </div>
       <div id="lowStockAlert"></div>
+
+      <button class="btn btn-block" id="btnShareFacebook" style="background:#1877F2;color:#fff;margin-top:14px;display:flex;align-items:center;justify-content:center;gap:8px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.3c-1.2 0-1.6.8-1.6 1.6V12h2.8l-.4 2.9h-2.4v7A10 10 0 0 0 22 12z"/></svg>
+        Facebook-এ ক্যাটালগ শেয়ার করুন
+      </button>
 
       <div class="section-title">সাম্প্রতিক বিক্রয়</div>
       <div class="card-list" id="recentSalesList"></div>
@@ -556,7 +565,7 @@
   let themes = [];
   let productImages = {};   // id -> dataURL, stored under separate keys so the main lists stay small
   let themeImages = {};
-  let shopSettings = {shopName:'আঁচল', tagline:'শাড়ী, কামিজ ও ওড়নার কালেকশন', phone:'', messenger:'', address:'', githubUser:'', githubRepo:'', githubToken:'', githubPath:'catalog-data.json'};
+  let shopSettings = {shopName:'আঁচল', tagline:'শাড়ী, কামিজ ও ওড়নার কালেকশন', phone:'', messenger:'', address:'', catalogUrl:'', githubUser:'', githubRepo:'', githubToken:'', githubPath:'catalog-data.json'};
   let productFilter = 'সব';
   let productSearchTerm = '';
   let saleSearchTerm = '';
@@ -1392,11 +1401,21 @@
   function openSettingsModal(){
     openModal(`
       <h2>সেটিংস ও ক্যাটালগ</h2>
+
+      <div class="field" style="background:var(--gold-soft);border-radius:10px;padding:12px;margin-bottom:16px;">
+        <label>পুরনো ব্যাকআপ থেকে পুনরুদ্ধার করুন</label>
+        <p style="font-size:12.5px;color:var(--ink-soft);margin:0 0 10px;">আগে ডাউনলোড করা বা GitHub-এ থাকা catalog-data.json ফাইল থেকে পণ্য, থিম ও ছবি ফিরিয়ে আনুন।</p>
+        <input type="file" id="restore-file-input" accept=".json,.txt,application/json,text/plain" style="display:none;">
+        <label class="btn btn-ghost btn-block" for="restore-file-input" style="margin-bottom:0;">📥 ব্যাকআপ ফাইল বেছে নিন</label>
+        <div id="restoreResult" style="font-size:13px;margin-top:8px;"></div>
+      </div>
+
       <div class="field"><label>দোকানের নাম</label><input id="set-name" value="${escapeHtml(shopSettings.shopName)}"></div>
       <div class="field"><label>ট্যাগলাইন</label><input id="set-tagline" value="${escapeHtml(shopSettings.tagline)}"></div>
       <div class="field"><label>WhatsApp নম্বর</label><input id="set-phone" value="${escapeHtml(shopSettings.phone)}" placeholder="যেমন: 8801XXXXXXXXX"></div>
       <div class="field"><label>Messenger ইউজারনেম / লিংক</label><input id="set-messenger" value="${escapeHtml(shopSettings.messenger)}" placeholder="ঐচ্ছিক"></div>
       <div class="field"><label>ঠিকানা</label><input id="set-address" value="${escapeHtml(shopSettings.address)}" placeholder="ঐচ্ছিক"></div>
+      <div class="field"><label>ক্যাটালগ ওয়েবসাইট লিংক</label><input id="set-catalog-url" value="${escapeHtml(shopSettings.catalogUrl)}" placeholder="যেমন: https://ruchiramahbub.github.io/anchal-catalog/catalog.html"></div>
       <div class="btn-row">
         <button class="btn btn-ghost" id="btnCancel">বাতিল</button>
         <button class="btn btn-primary" id="btnSaveSettings">সংরক্ষণ করুন</button>
@@ -1421,17 +1440,68 @@
       </div>
     `);
     document.getElementById('btnCancel').onclick = closeModal;
+    document.getElementById('restore-file-input').addEventListener('change', async (e)=>{
+      const file = e.target.files && e.target.files[0];
+      if(file) await importFromCatalogFile(file);
+    });
     document.getElementById('btnSaveSettings').onclick = async ()=>{
       shopSettings.shopName = document.getElementById('set-name').value.trim() || 'আঁচল';
       shopSettings.tagline = document.getElementById('set-tagline').value.trim();
       shopSettings.phone = document.getElementById('set-phone').value.trim();
       shopSettings.messenger = document.getElementById('set-messenger').value.trim();
       shopSettings.address = document.getElementById('set-address').value.trim();
+      shopSettings.catalogUrl = document.getElementById('set-catalog-url').value.trim();
       await saveShopSettings();
       closeModal();
     };
     document.getElementById('btnExportCatalog').onclick = exportCatalogData;
     document.getElementById('btnGithubSync').onclick = syncToGithub;
+  }
+
+  async function importFromCatalogFile(file){
+    const resultEl = document.getElementById('restoreResult');
+    resultEl.textContent = 'পড়া হচ্ছে...';
+    try{
+      const text = await file.text();
+      const data = JSON.parse(text);
+      if(!data || (!Array.isArray(data.products) && !Array.isArray(data.themes))){
+        resultEl.innerHTML = '<span style="color:var(--danger);">এটি সঠিক ক্যাটালগ ব্যাকআপ ফাইল বলে মনে হচ্ছে না।</span>';
+        return;
+      }
+      let importedThemes = 0, importedProducts = 0, skippedThemes = 0, skippedProducts = 0;
+      if(Array.isArray(data.themes)){
+        for(const t of data.themes){
+          if(!t || !t.id){ continue; }
+          if(themes.some(x=>x.id===t.id)){ skippedThemes++; continue; }
+          themes.push({id:t.id, name:t.name||'থিম', note:t.note||'', createdAt:Date.now()});
+          if(t.image){ themeImages[t.id] = t.image; await saveThemeImage(t.id, t.image); }
+          importedThemes++;
+        }
+        await saveThemes();
+      }
+      if(Array.isArray(data.products)){
+        for(const p of data.products){
+          if(!p || !p.id){ continue; }
+          if(products.some(x=>x.id===p.id)){ skippedProducts++; continue; }
+          products.push({id:p.id, name:p.name||'পণ্য', type:p.type||'অন্যান্য', design:p.design||'', price:Number(p.price)||0, stock:Number(p.stock)||0, note:p.note||'', themeId:p.themeId||null, createdAt:Date.now()});
+          if(p.image){ productImages[p.id] = p.image; await saveProductImage(p.id, p.image); }
+          importedProducts++;
+        }
+        await saveProducts();
+      }
+      if(data.shopName) shopSettings.shopName = data.shopName;
+      if(data.tagline) shopSettings.tagline = data.tagline;
+      if(data.phone) shopSettings.phone = data.phone;
+      if(data.messenger) shopSettings.messenger = data.messenger;
+      if(data.address) shopSettings.address = data.address;
+      await saveShopSettings();
+      renderAll();
+      let msg = `✅ পুনরুদ্ধার সম্পন্ন — ${bn(importedProducts)}টি পণ্য ও ${bn(importedThemes)}টি থিম যোগ হয়েছে।`;
+      if(skippedProducts || skippedThemes) msg += ` (${bn(skippedProducts+skippedThemes)}টি আগে থেকেই ছিল, বাদ দেওয়া হয়েছে।)`;
+      resultEl.innerHTML = `<span style="color:var(--good);">${msg}</span>`;
+    }catch(e){
+      resultEl.innerHTML = '<span style="color:var(--danger);">ফাইলটি পড়তে সমস্যা হয়েছে। সঠিক catalog-data.json ফাইল কিনা দেখুন।</span>';
+    }
   }
 
   function buildCatalogData(){
@@ -1465,6 +1535,51 @@
     return btoa(unescape(encodeURIComponent(str)));
   }
 
+  function composeOgImageFromProduct(imageDataUrl){
+    return new Promise((resolve, reject)=>{
+      const img = new Image();
+      img.onload = ()=>{
+        const W=1200, H=630;
+        const canvas = document.createElement('canvas');
+        canvas.width=W; canvas.height=H;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#7A2048';
+        ctx.fillRect(0,0,W,H);
+        const scale = Math.max(W/img.width, H/img.height);
+        const dw = img.width*scale, dh = img.height*scale;
+        const dx = (W-dw)/2, dy = (H-dh)/2;
+        ctx.drawImage(img, dx, dy, dw, dh);
+        const grad = ctx.createLinearGradient(0,H*0.55,0,H);
+        grad.addColorStop(0,'rgba(89,22,52,0)');
+        grad.addColorStop(1,'rgba(89,22,52,0.8)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0,0,W,H);
+        ctx.strokeStyle = '#C08A2E';
+        ctx.lineWidth = 6;
+        ctx.strokeRect(10,10,W-20,H-20);
+        resolve(canvas.toDataURL('image/jpeg', 0.85));
+      };
+      img.onerror = ()=>reject(new Error('image load failed'));
+      img.src = imageDataUrl;
+    });
+  }
+
+  async function pushFileToGithub(user, repo, token, path, base64Content, message){
+    const apiUrl = `https://api.github.com/repos/${encodeURIComponent(user)}/${encodeURIComponent(repo)}/contents/${path}`;
+    let sha = null;
+    try{
+      const getRes = await fetch(apiUrl, { headers: { 'Authorization':'token '+token, 'Accept':'application/vnd.github+json' } });
+      if(getRes.ok){ const getJson = await getRes.json(); sha = getJson.sha; }
+    }catch(e){ /* file may not exist yet — that's fine */ }
+    const putBody = { message, content: base64Content };
+    if(sha) putBody.sha = sha;
+    return fetch(apiUrl, {
+      method:'PUT',
+      headers: { 'Authorization':'token '+token, 'Accept':'application/vnd.github+json', 'Content-Type':'application/json' },
+      body: JSON.stringify(putBody)
+    });
+  }
+
   async function syncToGithub(){
     const btn = document.getElementById('btnGithubSync');
     const resultEl = document.getElementById('githubSyncResult');
@@ -1480,28 +1595,31 @@
     resultEl.textContent = '';
     try{
       const contentB64 = utf8ToBase64(JSON.stringify(buildCatalogData()));
-      const apiUrl = `https://api.github.com/repos/${encodeURIComponent(user)}/${encodeURIComponent(repo)}/contents/${path}`;
-      let sha = null;
-      try{
-        const getRes = await fetch(apiUrl, { headers: { 'Authorization':'token '+token, 'Accept':'application/vnd.github+json' } });
-        if(getRes.ok){ const getJson = await getRes.json(); sha = getJson.sha; }
-      }catch(e){ /* file may not exist yet — that's fine */ }
-      const putBody = { message:'ক্যাটালগ আপডেট — আঁচল খাতা থেকে', content: contentB64 };
-      if(sha) putBody.sha = sha;
-      const putRes = await fetch(apiUrl, {
-        method:'PUT',
-        headers: { 'Authorization':'token '+token, 'Accept':'application/vnd.github+json', 'Content-Type':'application/json' },
-        body: JSON.stringify(putBody)
-      });
-      if(putRes.ok){
-        resultEl.innerHTML = '<span style="color:var(--good);">✅ সফলভাবে GitHub-এ পাঠানো হয়েছে। ১-২ মিনিট পর ওয়েবসাইটে দেখা যাবে।</span>';
-        shopSettings.githubUser = user; shopSettings.githubRepo = repo; shopSettings.githubToken = token; shopSettings.githubPath = path;
-        await saveShopSettings();
-      } else {
+      const putRes = await pushFileToGithub(user, repo, token, path, contentB64, 'ক্যাটালগ আপডেট — আঁচল খাতা থেকে');
+      if(!putRes.ok){
         let msg = 'অজানা সমস্যা';
         try{ const errJson = await putRes.json(); msg = errJson.message || msg; }catch(e){}
         resultEl.innerHTML = `<span style="color:var(--danger);">সমস্যা হয়েছে (${putRes.status}): ${escapeHtml(msg)}</span>`;
+        return;
       }
+
+      // also push a fresh og-image.jpg made from the most recently added product photo
+      let imageNote = '';
+      const withImg = products.filter(p=>productImages[p.id]).sort((a,b)=>b.createdAt-a.createdAt);
+      if(withImg.length){
+        try{
+          const composed = await composeOgImageFromProduct(productImages[withImg[0].id]);
+          const imgB64 = composed.split(',')[1];
+          const imgRes = await pushFileToGithub(user, repo, token, 'og-image.jpg', imgB64, 'ক্যাটালগ ছবি আপডেট — আঁচল খাতা থেকে');
+          imageNote = imgRes.ok ? ' (সর্বশেষ পণ্যের ছবি দিয়ে প্রিভিউ ছবিও আপডেট হয়েছে)' : ' (ক্যাটালগ পাঠানো হয়েছে, তবে প্রিভিউ ছবি আপডেট করা যায়নি)';
+        }catch(e){
+          imageNote = ' (ক্যাটালগ পাঠানো হয়েছে, তবে প্রিভিউ ছবি তৈরিতে সমস্যা হয়েছে)';
+        }
+      }
+
+      resultEl.innerHTML = `<span style="color:var(--good);">✅ সফলভাবে GitHub-এ পাঠানো হয়েছে${imageNote}। ১-২ মিনিট পর ওয়েবসাইটে দেখা যাবে।</span>`;
+      shopSettings.githubUser = user; shopSettings.githubRepo = repo; shopSettings.githubToken = token; shopSettings.githubPath = path;
+      await saveShopSettings();
     }catch(e){
       resultEl.innerHTML = '<span style="color:var(--danger);">ইন্টারনেট সংযোগ বা টোকেনে সমস্যা হয়েছে। আবার চেষ্টা করুন।</span>';
     } finally {
@@ -1509,6 +1627,21 @@
     }
   }
   document.getElementById('btnSettings').addEventListener('click', openSettingsModal);
+
+  function shareCatalogOnFacebook(){
+    let url = (shopSettings.catalogUrl||'').trim();
+    if(!url){
+      try{ url = new URL('catalog.html', window.location.href).href; }catch(e){ url=''; }
+    }
+    if(!url || url.startsWith('file:')){
+      alert('আগে সেটিংসে গিয়ে "ক্যাটালগ ওয়েবসাইট লিংক" ঘরে আপনার catalog.html-এর সম্পূর্ণ ঠিকানা (যেমন: https://...github.io/.../catalog.html) বসিয়ে সংরক্ষণ করুন।');
+      openSettingsModal();
+      return;
+    }
+    const shareUrl = 'https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(url);
+    window.open(shareUrl, '_blank', 'noopener');
+  }
+  document.getElementById('btnShareFacebook').addEventListener('click', shareCatalogOnFacebook);
 
   // ---------- init ----------
   function setTodayLine(){
