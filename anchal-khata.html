@@ -565,7 +565,10 @@
   let themes = [];
   let productImages = {};   // id -> dataURL, stored under separate keys so the main lists stay small
   let themeImages = {};
-  let shopSettings = {shopName:'আঁচল', tagline:'শাড়ী, কামিজ ও ওড়নার কালেকশন', phone:'', messenger:'', address:'', catalogUrl:'', githubUser:'', githubRepo:'', githubToken:'', githubPath:'catalog-data.json'};
+  let shopSettings = {shopName:'আঁচল', tagline:'শাড়ী, কামিজ ও ওড়নার কালেকশন', phone:'', messenger:'', address:'', catalogUrl:'', githubUser:'', githubRepo:'', githubToken:'', githubPath:'catalog-data.json', syncRepo:'', syncPath:'anchal-khata-sync.json'};
+  let dataUpdatedAt = 0;
+  let applyingRemoteSync = false;
+  let syncDebounceTimer = null;
   let productFilter = 'সব';
   let productSearchTerm = '';
   let saleSearchTerm = '';
@@ -593,12 +596,18 @@
       const ss = await storageAdapter.get('shopSettings');
       if(ss) shopSettings = Object.assign({}, shopSettings, JSON.parse(ss.value));
     }catch(e){ /* keep defaults */ }
+    try{
+      const du = await storageAdapter.get('dataUpdatedAt');
+      dataUpdatedAt = du ? (Number(du.value)||0) : 0;
+    }catch(e){ dataUpdatedAt = 0; }
     await loadAndMigrateImages();
+    await pullSyncFromGithub();
     renderAll();
   }
   async function saveShopSettings(){
     try{ await storageAdapter.set('shopSettings', JSON.stringify(shopSettings)); }
     catch(e){ alert('সেটিংস সংরক্ষণে সমস্যা হয়েছে।'); }
+    markDirtyAndScheduleSync();
   }
   async function loadAndMigrateImages(){
     let productsChanged = false, themesChanged = false;
@@ -629,26 +638,31 @@
   async function saveProducts(){
     try{ await storageAdapter.set('products', JSON.stringify(products)); }
     catch(e){ alert('পণ্যের তথ্য সংরক্ষণে সমস্যা হয়েছে। আবার চেষ্টা করুন।'); }
+    markDirtyAndScheduleSync();
   }
   async function saveSales(){
     try{ await storageAdapter.set('sales', JSON.stringify(sales)); }
     catch(e){ alert('বিক্রয়ের তথ্য সংরক্ষণে সমস্যা হয়েছে। আবার চেষ্টা করুন।'); }
+    markDirtyAndScheduleSync();
   }
   async function saveThemes(){
     try{ await storageAdapter.set('themes', JSON.stringify(themes)); }
     catch(e){ alert('থিমের তথ্য সংরক্ষণে সমস্যা হয়েছে। আবার চেষ্টা করুন।'); }
+    markDirtyAndScheduleSync();
   }
   async function saveProductImage(id, dataUrl){
     try{
       if(dataUrl){ await storageAdapter.set('product-image:'+id, dataUrl, false); }
       else { try{ await storageAdapter.delete('product-image:'+id, false); }catch(e){} }
     }catch(e){ alert('ছবি সংরক্ষণে সমস্যা হয়েছে। ছবিটি একটু ছোট করে আবার চেষ্টা করুন।'); }
+    markDirtyAndScheduleSync();
   }
   async function saveThemeImage(id, dataUrl){
     try{
       if(dataUrl){ await storageAdapter.set('theme-image:'+id, dataUrl, false); }
       else { try{ await storageAdapter.delete('theme-image:'+id, false); }catch(e){} }
     }catch(e){ alert('ছবি সংরক্ষণে সমস্যা হয়েছে। ছবিটি একটু ছোট করে আবার চেষ্টা করুন।'); }
+    markDirtyAndScheduleSync();
   }
 
   // ---------- nav ----------
@@ -1438,6 +1452,14 @@
         <button class="btn btn-primary btn-block" id="btnGithubSync">🔄 GitHub-এ সরাসরি সিঙ্ক করুন</button>
         <div id="githubSyncResult" style="font-size:13px;margin-top:8px;"></div>
       </div>
+
+      <div class="field" style="margin-top:16px;border-top:1px solid var(--line);padding-top:16px;background:var(--teal-soft);border-radius:10px;padding:12px;">
+        <label>ফোন ও কম্পিউটারে একই ডেটা — প্রাইভেট সিঙ্ক</label>
+        <p style="font-size:12.5px;color:var(--ink-soft);margin:0 0 10px;">পণ্য, থিম, বিক্রয় ও বাকির সম্পূর্ণ হিসাব একটি আলাদা প্রাইভেট GitHub রিপোজিটরিতে (উপরের পাবলিক ক্যাটালগ রিপো থেকে আলাদা) সংরক্ষিত হবে, যাতে কাস্টমারের তথ্য পাবলিক ওয়েবে না যায়। উপরের ইউজারনেম ও টোকেনই এখানে ব্যবহার হবে — টোকেনে এই প্রাইভেট রিপোতেও "Contents: Read and write" অনুমতি দিন। সেভ করার পর প্রতিটি পরিবর্তন এবং অ্যাপ খোলার সময় স্বয়ংক্রিয়ভাবে সিঙ্ক হবে।</p>
+        <div class="field"><label>প্রাইভেট রিপোজিটরির নাম</label><input id="sync-repo" value="${escapeHtml(shopSettings.syncRepo)}" placeholder="যেমন: anchal-khata"></div>
+        <button class="btn btn-primary btn-block" id="btnSyncNow">🔁 এখনই সিঙ্ক করুন</button>
+        <div id="syncStatusResult" style="font-size:13px;margin-top:8px;"></div>
+      </div>
     `);
     document.getElementById('btnCancel').onclick = closeModal;
     document.getElementById('restore-file-input').addEventListener('change', async (e)=>{
@@ -1451,11 +1473,20 @@
       shopSettings.messenger = document.getElementById('set-messenger').value.trim();
       shopSettings.address = document.getElementById('set-address').value.trim();
       shopSettings.catalogUrl = document.getElementById('set-catalog-url').value.trim();
+      shopSettings.syncRepo = document.getElementById('sync-repo').value.trim();
       await saveShopSettings();
       closeModal();
     };
     document.getElementById('btnExportCatalog').onclick = exportCatalogData;
     document.getElementById('btnGithubSync').onclick = syncToGithub;
+    document.getElementById('btnSyncNow').onclick = async ()=>{
+      shopSettings.githubUser = document.getElementById('gh-user').value.trim();
+      shopSettings.githubToken = document.getElementById('gh-token').value.trim();
+      shopSettings.syncRepo = document.getElementById('sync-repo').value.trim();
+      await saveShopSettings();
+      await manualSyncNow();
+    };
+    updateSyncStatusUI();
   }
 
   async function importFromCatalogFile(file){
@@ -1626,6 +1657,127 @@
       btn.disabled = false; btn.textContent = '🔄 GitHub-এ সরাসরি সিঙ্ক করুন';
     }
   }
+
+  // ---------- private full-data sync (phone <-> computer) ----------
+  // Unlike syncToGithub() above (which only pushes public catalog info to the public
+  // catalog repo), this syncs EVERYTHING — including sales and due amounts — to a
+  // separate PRIVATE repo, so customer names/phone numbers/dues never end up on the
+  // public website. It runs automatically: once on every app open (pull), and a couple
+  // of seconds after every local change (push), so both devices converge on whichever
+  // copy was edited most recently.
+  function base64ToUtf8(b64){
+    return decodeURIComponent(escape(atob(b64.replace(/\n/g,''))));
+  }
+  function buildFullSyncData(){
+    return {
+      kind: 'anchal-khata-full-backup',
+      version: 3,
+      exportedAt: new Date().toISOString(),
+      updatedAt: dataUpdatedAt,
+      shopName: shopSettings.shopName || 'আঁচল',
+      tagline: shopSettings.tagline || '',
+      phone: shopSettings.phone || '',
+      messenger: shopSettings.messenger || '',
+      address: shopSettings.address || '',
+      catalogUrl: shopSettings.catalogUrl || '',
+      themes: themes.map(t=>({id:t.id, name:t.name, note:t.note||'', createdAt:t.createdAt||Date.now(), image:themeImages[t.id]||null})),
+      products: products.map(p=>({id:p.id, name:p.name, type:p.type, design:p.design||'', price:p.price, stock:p.stock, note:p.note||'', themeId:p.themeId||null, createdAt:p.createdAt||Date.now(), image:productImages[p.id]||null})),
+      sales: sales
+    };
+  }
+  function markDirtyAndScheduleSync(){
+    if(applyingRemoteSync) return; // don't push while we're in the middle of applying a pulled copy
+    dataUpdatedAt = Date.now();
+    try{ storageAdapter.set('dataUpdatedAt', String(dataUpdatedAt)); }catch(e){}
+    if(!shopSettings.githubUser || !shopSettings.syncRepo || !shopSettings.githubToken) return;
+    if(syncDebounceTimer) clearTimeout(syncDebounceTimer);
+    syncDebounceTimer = setTimeout(()=>{ pushSyncToGithub(); }, 1800);
+  }
+  async function pushSyncToGithub(){
+    const user = shopSettings.githubUser, repo = shopSettings.syncRepo, token = shopSettings.githubToken;
+    const path = shopSettings.syncPath || 'anchal-khata-sync.json';
+    if(!user || !repo || !token) return;
+    try{
+      const contentB64 = utf8ToBase64(JSON.stringify(buildFullSyncData()));
+      const res = await pushFileToGithub(user, repo, token, path, contentB64, 'সিঙ্ক আপডেট — আঁচল খাতা থেকে');
+      if(res.ok){
+        try{ await storageAdapter.set('lastSyncedAt', String(dataUpdatedAt)); }catch(e){}
+        updateSyncStatusUI();
+      } else {
+        updateSyncStatusUI('সমস্যা হয়েছে — টোকেন বা রিপোর নাম আবার দেখুন।');
+      }
+    }catch(e){
+      updateSyncStatusUI('ইন্টারনেট সংযোগ সমস্যা — পরে আবার চেষ্টা হবে।');
+    }
+  }
+  async function pullSyncFromGithub(){
+    const user = shopSettings.githubUser, repo = shopSettings.syncRepo, token = shopSettings.githubToken;
+    const path = shopSettings.syncPath || 'anchal-khata-sync.json';
+    if(!user || !repo || !token) return;
+    try{
+      const apiUrl = `https://api.github.com/repos/${encodeURIComponent(user)}/${encodeURIComponent(repo)}/contents/${path}`;
+      const res = await fetch(apiUrl, { headers: { 'Authorization':'token '+token, 'Accept':'application/vnd.github+json' } });
+      if(!res.ok) return; // not found yet, or auth issue — keep using local data quietly
+      const json = await res.json();
+      const remote = JSON.parse(base64ToUtf8((json.content||'').replace(/\n/g,'')));
+      if(!remote || remote.kind!=='anchal-khata-full-backup') return;
+      const remoteUpdatedAt = Number(remote.updatedAt)||0;
+      if(remoteUpdatedAt <= dataUpdatedAt) return; // our copy is already this fresh or fresher
+      applyingRemoteSync = true;
+      themes = (remote.themes||[]).map(t=>({id:t.id, name:t.name||'থিম', note:t.note||'', createdAt:t.createdAt||Date.now()}));
+      themeImages = {};
+      (remote.themes||[]).forEach(t=>{ if(t.image) themeImages[t.id] = t.image; });
+      products = (remote.products||[]).map(p=>({id:p.id, name:p.name||'পণ্য', type:p.type||'অন্যান্য', design:p.design||'', price:Number(p.price)||0, stock:Number(p.stock)||0, note:p.note||'', themeId:p.themeId||null, createdAt:p.createdAt||Date.now()}));
+      productImages = {};
+      (remote.products||[]).forEach(p=>{ if(p.image) productImages[p.id] = p.image; });
+      sales = remote.sales || [];
+      if(remote.shopName) shopSettings.shopName = remote.shopName;
+      if(remote.tagline) shopSettings.tagline = remote.tagline;
+      if(remote.phone) shopSettings.phone = remote.phone;
+      if(remote.messenger) shopSettings.messenger = remote.messenger;
+      if(remote.address) shopSettings.address = remote.address;
+      if(remote.catalogUrl) shopSettings.catalogUrl = remote.catalogUrl;
+      dataUpdatedAt = remoteUpdatedAt;
+      await storageAdapter.set('products', JSON.stringify(products));
+      await storageAdapter.set('themes', JSON.stringify(themes));
+      await storageAdapter.set('sales', JSON.stringify(sales));
+      await storageAdapter.set('shopSettings', JSON.stringify(shopSettings));
+      await Promise.all(products.map(p=> productImages[p.id] ? storageAdapter.set('product-image:'+p.id, productImages[p.id], false) : Promise.resolve()));
+      await Promise.all(themes.map(t=> themeImages[t.id] ? storageAdapter.set('theme-image:'+t.id, themeImages[t.id], false) : Promise.resolve()));
+      await storageAdapter.set('dataUpdatedAt', String(dataUpdatedAt));
+      await storageAdapter.set('lastSyncedAt', String(dataUpdatedAt));
+      applyingRemoteSync = false;
+    }catch(e){
+      applyingRemoteSync = false;
+      // offline or a one-off error — the app keeps working from local data
+    }
+  }
+  async function manualSyncNow(){
+    const resultEl = document.getElementById('syncStatusResult');
+    if(resultEl) resultEl.textContent = 'সিঙ্ক হচ্ছে...';
+    await pullSyncFromGithub();
+    await pushSyncToGithub();
+    renderAll();
+    updateSyncStatusUI();
+  }
+  function updateSyncStatusUI(errorMsg){
+    const resultEl = document.getElementById('syncStatusResult');
+    if(!resultEl) return;
+    if(errorMsg){ resultEl.innerHTML = `<span style="color:var(--danger);">${escapeHtml(errorMsg)}</span>`; return; }
+    if(!shopSettings.githubUser || !shopSettings.syncRepo || !shopSettings.githubToken){
+      resultEl.textContent = 'সিঙ্ক চালু করতে উপরে ইউজারনেম, টোকেন ও প্রাইভেট রিপোর নাম দিন।';
+      return;
+    }
+    storageAdapter.get('lastSyncedAt').then(r=>{
+      if(r && r.value){
+        const d = new Date(Number(r.value));
+        resultEl.innerHTML = `<span style="color:var(--good);">✅ সর্বশেষ সিঙ্ক: ${fmtDate(d)}</span>`;
+      } else {
+        resultEl.textContent = '"এখনই সিঙ্ক করুন" চেপে প্রথমবার সিঙ্ক করুন।';
+      }
+    }).catch(()=>{});
+  }
+
   document.getElementById('btnSettings').addEventListener('click', openSettingsModal);
 
   function shareCatalogOnFacebook(){
