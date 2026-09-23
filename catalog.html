@@ -331,9 +331,13 @@
   }
   function messengerLink(m){
     if(!m) return null;
-    m = m.trim();
-    if(m.startsWith('http')) return m;
-    return 'https://m.me/'+m.replace(/^@/,'');
+    m = String(m).trim();
+    if(!m) return null;
+    if(/^https?:\/\//i.test(m)) return m;
+    m = m.replace(/\s+/g,'');
+    m = m.replace(/^@/,'').replace(/^(www\.)?facebook\.com\//i,'').replace(/^m\.me\//i,'');
+    if(!m) return null;
+    return 'https://m.me/'+m;
   }
 
   function renderContact(){
